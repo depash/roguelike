@@ -1,5 +1,5 @@
 class Enemy {
-    constructor(name, level, baseHealth, baseAttack, baseDefense, minGold, maxGold) {
+    constructor(name, level, baseHealth, baseAttack, baseDefense, minGold, maxGold, minExp, maxExp) {
         this.name = `${name} Lv.${level}`;
         this.level = level;
         this.health = baseHealth + (level - 1) * 10;    // +10 HP per level
