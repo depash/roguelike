@@ -77,6 +77,12 @@
     box-shadow: 0 6px #750000;
 }
 
+.attackButton:active {
+    background: linear-gradient(to bottom, #cc3d4c, #a10000);
+    transform: translateY(1px);
+    box-shadow: 0 2px #750000;
+}
+
 .defendButton {
     background: linear-gradient(to bottom, #00c896, #007f66);
     color: white;
@@ -92,4 +98,10 @@
 .defendButton:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px #004c3b;
+}
+
+.defendButton:active {
+    background: linear-gradient(to bottom, #00a67b, #006450);
+    transform: translateY(1px);
+    box-shadow: 0 2px #004c3b;
 }
