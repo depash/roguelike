@@ -1,28 +1,48 @@
 export class Player {
-    constructor(name) {
+    constructor(name, level = 1, baseHealth = 100, baseAttack = 5, baseDefense = 2, gold = 0, exp = 0, currentHealth = null) {
         this.name = name;
-        this.level = 1;
-        this.health = 100;
-        this.maxHealth = 100;
-        this.attack = 5;
-        this.defense = 2;
-        this.gold = 0;
-        this.exp = 0;
+        this.level = level;
+        this.baseHealth = baseHealth;
+        this.baseAttack = baseAttack;
+        this.baseDefense = baseDefense;
+        this.gold = gold;
+        this.exp = exp;
+        this.nextLevelExp = 50;
+        this.currentHealth = currentHealth !== null ? currentHealth : this.maxHealth;
+    }
+
+    get maxHealth() {
+        return this.baseHealth + (this.level - 1) * 20;
+    }
+
+    get attack() {
+        return this.baseAttack + (this.level - 1) * 2;
+    }
+
+    get defense() {
+        return this.baseDefense + (this.level - 1) * 1;
+    }
+
+
+    clone() {
+        return Object.create(Object.getPrototypeOf(this), Object.getOwnPropertyDescriptors(this));
     }
 
     takeDamage(damage) {
-        this.health -= damage;
-        if (this.health <= 0) {
-            console.log(`${this.name} has died. Game over.`);
-        }
+        const clone = this.clone();
+        clone.currentHealth -= damage;
+        return clone;
     }
 
     levelUp() {
-        this.exp = 0;
-        this.level++;
-        this.maxHealth += 20;
-        this.health = this.maxHealth;
-        this.attack += 2;
-        this.defense += 1;
+        const clone = this.clone();
+        clone.exp = 0;
+        clone.level++;
+        clone.currentHealth = clone.maxHealth;
+        return clone;
+    }
+
+    isAlive() {
+        return this.currentHealth > 0;
     }
 }

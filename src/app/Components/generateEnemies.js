@@ -1,23 +1,67 @@
 class Enemy {
-    constructor(name, level, baseHealth, baseAttack, baseDefense, minGold, maxGold, minExp, maxExp) {
-        this.name = `${name} Lv.${level}`;
+    constructor(name, level, baseHealth, baseAttack, baseDefense, minGold, maxGold, minExp, maxExp, currentHealth = null) {
+        this.baseName = name;
         this.level = level;
-        this.health = baseHealth + (level - 1) * 10;    // +10 HP per level
-        this.attack = baseAttack + (level - 1) * 2;     // +2 ATK per level
-        this.defense = baseDefense + (level - 1) * 1;   // +1 DEF per level
-        this.minGold = minGold + (level - 1) * 2;       // +2 gold min per level
-        this.maxGold = maxGold + (level - 1) * 5;       // +5 gold max per level
-        this.minExp = minExp + (level - 1) * 3;         // +3 exp per level
-        this.maxExp = maxExp + (level - 1) * 7;         // +7 exp per level
+        this.baseHealth = baseHealth;
+        this.baseAttack = baseAttack;
+        this.baseDefense = baseDefense;
+        this.baseMinGold = minGold;
+        this.baseMaxGold = maxGold;
+        this.baseMinExp = minExp;
+        this.baseMaxExp = maxExp;
+        this.currentHealth = currentHealth !== null ? currentHealth : this.maxHealth;
+    }
+
+    get name() {
+        return `${this.baseName} Lv.${this.level}`;
+    }
+
+    // +10 HP per level (after level 1)
+    get maxHealth() {
+        return this.baseHealth + (this.level - 1) * 10;
+    }
+
+    // +2 attack per level (after level 1)
+    get attack() {
+        return this.baseAttack + (this.level - 1) * 2;
+    }
+
+    // +1 defense per level (after level 1)
+    get defense() {
+        return this.baseDefense + (this.level - 1) * 1;
+    }
+
+    // +2 minimum gold per level (after level 1)
+    get minGold() {
+        return this.baseMinGold + (this.level - 1) * 2;
+    }
+
+    // +5 maximum gold per level (after level 1)
+    get maxGold() {
+        return this.baseMaxGold + (this.level - 1) * 5;
+    }
+
+    // +3 minimum EXP per level (after level 1)
+    get minExp() {
+        return this.baseMinExp + (this.level - 1) * 3;
+    }
+
+    // +7 maximum EXP per level (after level 1)
+    get maxExp() {
+        return this.baseMaxExp + (this.level - 1) * 7;
+    }
+
+
+    clone() {
+        return Object.create(Object.getPrototypeOf(this), Object.getOwnPropertyDescriptors(this));
     }
 
     takeDamage(damage) {
-        this.health -= damage;
-        if (this.health <= 0) {
-            return this.die();
-        }
-        return 0;
+        const clone = this.clone();
+        clone.currentHealth -= damage;
+        return clone;
     }
+
 
     die() {
         const goldDropped = Math.floor(Math.random() * (this.maxGold - this.minGold + 1)) + this.minGold;
@@ -74,7 +118,7 @@ const allEnemies = [Goblin, Orc, Troll, Skeleton, Bandit, Witch, Demon];
 
 // Generate enemy of random type with level scaled based on player level
 export function generateEnemyBasedOnPlayerLevel(playerLevel) {
-    const enemyLevel = Math.max(1, playerLevel + Math.floor(Math.random() * 3) - 1);
+    const enemyLevel = playerLevel;
 
     const EnemyClass = allEnemies[Math.floor(Math.random() * allEnemies.length)];
 
