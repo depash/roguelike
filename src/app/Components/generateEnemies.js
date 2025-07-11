@@ -51,6 +51,10 @@ class Enemy {
         return this.baseMaxExp + (this.level - 1) * 7;
     }
 
+    get isAlive() {
+        return this.currentHealth > 0;
+    }
+
 
     clone() {
         return Object.create(Object.getPrototypeOf(this), Object.getOwnPropertyDescriptors(this));

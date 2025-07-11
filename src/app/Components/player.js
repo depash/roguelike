@@ -23,6 +23,10 @@ export class Player {
         return this.baseDefense + (this.level - 1) * 1;
     }
 
+    get isAlive() {
+        return this.currentHealth > 0;
+    }
+
 
     clone() {
         return Object.create(Object.getPrototypeOf(this), Object.getOwnPropertyDescriptors(this));
@@ -40,9 +44,5 @@ export class Player {
         clone.level++;
         clone.currentHealth = clone.maxHealth;
         return clone;
-    }
-
-    isAlive() {
-        return this.currentHealth > 0;
     }
 }

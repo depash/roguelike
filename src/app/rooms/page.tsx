@@ -36,8 +36,20 @@ const rooms = () => {
 
                     <div className={styles.playerActions}>
                         <button className={styles.attackButton} onClick={() => {
-                            if ((enemy.currentHealth - player.attack) <= 0) {
-                                const { gold, exp } = enemy.die();
+                            let updatedEnemy = enemy.takeDamage(player.attack)
+                            if (updatedEnemy.isAlive) {
+                                let updatedPlayer = player.takeDamage(enemy.attack)
+                                if (updatedPlayer.isAlive) {
+                                    setPlayer(updatedPlayer);
+                                }
+                                else {
+                                    setPlayer(new Player('player')); // Reset player on death
+                                    setEnemy(generateEnemyBasedOnPlayerLevel(1)); // Reset enemy to level 1
+                                }
+                                setEnemy(updatedEnemy);
+                            }
+                            else {
+                                const { gold, exp } = updatedEnemy.die();
                                 player.gold += gold;
                                 player.exp += exp;
                                 if (player.exp >= player.nextLevelExp) {
@@ -50,15 +62,19 @@ const rooms = () => {
                                 }
                                 setRoomNum(roomNum + 1);
                             }
-                            else {
-                                setEnemy(enemy.takeDamage(player.attack));
-                                setPlayer(player.takeDamage(enemy.attack));
-                            }
                         }}>
                             Attack
                         </button>
                         <button className={styles.defendButton} onClick={() => {
-                            setPlayer(player.takeDamage(enemy.attack - player.defense));
+                            let updatedPlayer = player.takeDamage(enemy.attack - player.defense)
+                            if (updatedPlayer.isAlive) {
+                                setPlayer(updatedPlayer);
+                            }
+                            else {
+                                setPlayer(new Player('player')); // Reset player on death
+                                setEnemy(generateEnemyBasedOnPlayerLevel(1)); // Reset enemy to level 1
+                            }
+
                         }}>
                             Defend
                         </button>
