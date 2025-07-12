@@ -5,6 +5,7 @@ import { Player } from '../Components/player.js'
 import { generateEnemyBasedOnPlayerLevel } from '../Components/generateEnemies.js'
 import { EnemyCard } from '../Components/EnemyCard.js';
 import { PlayerCard } from '../Components/PlayerCard.js';
+import { Warrior, Healer, Mage, Rogue } from '../Components/subClasses.js';
 
 // adding special attack/mana/recource of some kind
 // adding allies (healer, mage, worrior, ranger/rouge)
@@ -22,10 +23,12 @@ import { PlayerCard } from '../Components/PlayerCard.js';
 // floors that be what determines allies being added or rest spot
 
 const rooms = () => {
-    const [players, setPlayers] = useState([new Player('Warrior')]); // Start with 1
+
+    const [players, setPlayers] = useState([new Player('Warrior')]);
     const [enemies, setEnemies] = useState([generateEnemyBasedOnPlayerLevel(1)]);
     const [roomNum, setRoomNum] = useState(1);
     const [floorNum, setFloorNum] = useState(1);
+    const [turn, setTurn] = useState(1);
 
     const addPlayer = (newPlayer: any) => {
         setPlayers(prevPlayers => [...prevPlayers, newPlayer]);
@@ -54,12 +57,6 @@ const rooms = () => {
                             key={index}
                             player={player}
                             enemies={enemies}
-                            setPlayer={setPlayers}
-                            setEnemy={setEnemies}
-                            roomNum={roomNum}
-                            setRoomNum={setRoomNum}
-                            addPlayer={addPlayer}
-                            addEnemy={addEnemy}
                             styles={styles}
                         />
                     ))}

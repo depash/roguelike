@@ -1,4 +1,4 @@
-import { Player } from './Player';
+import { Player } from '/Player';
 
 // make inherated from player class
 // warrior: taunt, single target attack, self buff for attack and defense
@@ -20,7 +20,7 @@ import { Player } from './Player';
 // }
 
 export class Warrior extends Player {
-    constructor(name = 'Warrior', skills = []) {
+    constructor(name = 'Warrior') {
         super(name, 1, 120, 8, 5);
         this.skills = [
             {
@@ -51,7 +51,7 @@ export class Warrior extends Player {
 
 
 export class Healer extends Player {
-    constructor(name = 'Healer', skills = []) {
+    constructor(name = 'Healer') {
         super(name, 1, 90, 4, 3);
         this.skills = [
             {
@@ -84,7 +84,7 @@ export class Healer extends Player {
 
 
 export class Mage extends Player {
-    constructor(name = 'Mage', skills = []) {
+    constructor(name = 'Mage') {
         super(name, 1, 80, 10, 2);
         this.skills = [
             {
@@ -118,7 +118,7 @@ export class Mage extends Player {
 
 
 export class Rogue extends Player {
-    constructor(name = 'Rogue', skills = []) {
+    constructor(name = 'Rogue') {
         super(name, 1, 100, 7, 3);
         this.skills = [
             {
