@@ -11,13 +11,6 @@ import { PlayerCard } from '../Components/PlayerCard.js';
 
 // 8 max 4 on both sides
 
-// make inherated from player class
-// Healer: Group healing, single target healing, curing status effects
-// mage: aoe attack, stun(RNG 80% reduce by 15% per stun restarts after new room), buff increace damage of attacks
-// warrior: taunt/stun(aoe 40% reduced by 15% per stun restarts after new room), single target attack, self buff for attack and defense
-// ranger/rouge: single targer poison, single target high attack, enemy defence defuff, mabey steal gold
-// satus effects: mabey poison, stun, burn, freeze, bleed
-
 // multiple enemies
 // mabey big boss at the end of each 25 rooms before endless mode of some kind
 // get random allie as the rooms go on
