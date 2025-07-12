@@ -1,5 +1,5 @@
 class Enemy {
-    constructor(name, level, baseHealth, baseAttack, baseDefense, minGold, maxGold, minExp, maxExp, currentHealth = null) {
+    constructor(name, level, baseHealth, baseAttack, baseDefense, minGold, maxGold, minExp, maxExp, currentHealth = null, diffucilty) {
         this.baseName = name;
         this.level = level;
         this.baseHealth = baseHealth;
@@ -10,6 +10,7 @@ class Enemy {
         this.baseMinExp = minExp;
         this.baseMaxExp = maxExp;
         this.currentHealth = currentHealth !== null ? currentHealth : this.maxHealth;
+        this.diffucilty = diffucilty;
     }
 
     get name() {
@@ -76,7 +77,7 @@ class Enemy {
 
 class Goblin extends Enemy {
     constructor(level) {
-        super("Goblin", level, 50, 3, 1, 5, 15, 10, 20);
+        super("Goblin", level, 50, 3, 1, 5, 15, 10, 20, 1);
         // (name, level, baseHealth, baseAttack, baseDefense, minGold, maxGold, minExp, maxExp)
     }
 }
@@ -111,18 +112,29 @@ class Witch extends Enemy {
     }
 }
 
+//imps with demons
 class Demon extends Enemy {
     constructor(level) {
         super("Demon", level, 150, 10, 6, 25, 50, 30, 60);
     }
 }
 
+class Slimes extends Enemy {
+    constructor(level) {
+        super("Slimes", level, 150, 10, 6, 25, 50, 30, 60);
+    }
+}
+
+// final boss be dragon
+
 // Array of all enemy classes
-const allEnemies = [Goblin, Orc, Troll, Skeleton, Bandit, Witch, Demon];
+const allEnemies = [Goblin, Orc, Troll, Skeleton, Bandit, Witch, Demon, Slimes];
 
 // Generate enemy of random type with level scaled based on player level
 export function generateEnemyBasedOnPlayerLevel(playerLevel) {
     const enemyLevel = playerLevel;
+
+    // generate number of enemies based on player level and difficulty
 
     const EnemyClass = allEnemies[Math.floor(Math.random() * allEnemies.length)];
 

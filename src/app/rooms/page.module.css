@@ -7,29 +7,45 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 30px;
 }
 
-.playerContainer {
+.playersContainer {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
     bottom: 20vh;
     position: absolute;
     width: 100%;
     height: 200px;
-    justify-content: space-between;
+    justify-content: center;
 }
 
-.enemyContainer {
+.enemiesContainer {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+}
+
+.playerActions {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
+}
+
+.individualEnemyContainer {
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 
-.playerActions {
+.individualPlayerContainer {
     display: flex;
     width: 30vw;
-    justify-content: space-around;
+    flex-direction: column;
+    align-items: center;
+    height: 20vh;
+    justify-content: space-between;
 }
 
 .attackButton {
