@@ -1,4 +1,4 @@
-import { Player } from '/Player';
+import { Player } from './player.js';
 
 // make inherated from player class
 // warrior: taunt, single target attack, self buff for attack and defense

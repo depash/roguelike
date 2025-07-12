@@ -1,10 +1,9 @@
 import { generateEnemyBasedOnPlayerLevel } from "./generateEnemies";
 import { Player } from "./player";
 
-export const PlayerCard = ({ player, enemies, styles }) => {
+export const PlayerCard = ({ player, enemies, addPlayer, styles }) => {
 
     const handleAttack = () => {
-
     };
 
     const handleDefend = () => {
@@ -14,6 +13,7 @@ export const PlayerCard = ({ player, enemies, styles }) => {
     return (
         <div className={styles.individualPlayerContainer}>
             <div>
+                <h2>{player.name}</h2>
                 <p>Level: {player.level}</p>
                 <p>Health: {player.currentHealth}/{player.maxHealth}</p>
                 <p>Attack: {player.attack}</p>

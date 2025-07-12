@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import styles from "./page.module.css";
 import { Player } from '../Components/player.js'
 import { generateEnemyBasedOnPlayerLevel } from '../Components/generateEnemies.js'
@@ -21,20 +21,32 @@ import { Warrior, Healer, Mage, Rogue } from '../Components/subClasses.js';
 // adding sounds of combat
 // add images to enimies and players
 // floors that be what determines allies being added or rest spot
-
 const rooms = () => {
+    const classes = [Warrior, Healer, Mage, Rogue];
+    const availableClasses = useRef([...classes]);
 
-    const [players, setPlayers] = useState([new Player('Warrior')]);
+    const [players, setPlayers] = useState(() => {
+        const classes = availableClasses.current;
+        const selectedIndex = Math.floor(Math.random() * classes.length);
+        const PlayerClass = classes[selectedIndex];
+        classes.splice(selectedIndex, 1);
+        availableClasses.current = classes;
+        return [new PlayerClass()];
+    });
     const [enemies, setEnemies] = useState([generateEnemyBasedOnPlayerLevel(1)]);
     const [roomNum, setRoomNum] = useState(1);
     const [floorNum, setFloorNum] = useState(1);
     const [turn, setTurn] = useState(1);
 
-    const addPlayer = (newPlayer: any) => {
-        setPlayers(prevPlayers => [...prevPlayers, newPlayer]);
+    const addPlayer = () => {
+        const classes = availableClasses.current;
+        let selectedClass = Math.floor(Math.random() * classes.length);
+        let newClass = new classes[selectedClass]();
+        classes.splice(selectedClass, 1);
+        availableClasses.current = classes;
+        setPlayers(prevPlayers => [...prevPlayers, newClass]);
     };
 
-    // Add a new Enemy to the enemies array
     const addEnemy = (newEnemy: any) => {
         setEnemies(prevEnemies => [...prevEnemies, newEnemy]);
     };
@@ -57,6 +69,7 @@ const rooms = () => {
                             key={index}
                             player={player}
                             enemies={enemies}
+                            addPlayer={addPlayer}
                             styles={styles}
                         />
                     ))}
