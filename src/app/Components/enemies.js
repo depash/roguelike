@@ -1,4 +1,4 @@
-class Enemy {
+export class Enemy {
     constructor(name, level, baseHealth, baseAttack, baseDefense, minGold, maxGold, minExp, maxExp, currentHealth = null, diffucilty) {
         this.baseName = name;
         this.level = level;
@@ -17,37 +17,37 @@ class Enemy {
         return `${this.baseName} Lv.${this.level}`;
     }
 
-    // +10 HP per level (after level 1)
+    // +10 HP per level
     get maxHealth() {
         return this.baseHealth + (this.level - 1) * 10;
     }
 
-    // +2 attack per level (after level 1)
+    // +2 attack per level
     get attack() {
         return this.baseAttack + (this.level - 1) * 2;
     }
 
-    // +1 defense per level (after level 1)
+    // +1 defense per level
     get defense() {
         return this.baseDefense + (this.level - 1) * 1;
     }
 
-    // +2 minimum gold per level (after level 1)
+    // +2 minimum gold per level
     get minGold() {
         return this.baseMinGold + (this.level - 1) * 2;
     }
 
-    // +5 maximum gold per level (after level 1)
+    // +5 maximum gold per level
     get maxGold() {
         return this.baseMaxGold + (this.level - 1) * 5;
     }
 
-    // +3 minimum EXP per level (after level 1)
+    // +3 minimum EXP per level
     get minExp() {
         return this.baseMinExp + (this.level - 1) * 3;
     }
 
-    // +7 maximum EXP per level (after level 1)
+    // +7 maximum EXP per level
     get maxExp() {
         return this.baseMaxExp + (this.level - 1) * 7;
     }

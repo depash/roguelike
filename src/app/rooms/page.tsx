@@ -1,18 +1,13 @@
 "use client";
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import styles from "./page.module.css";
 import { Player } from '../Components/player.js'
-import { generateEnemyBasedOnPlayerLevel } from '../Components/generateEnemies.js'
+import { Enemy, generateEnemyBasedOnPlayerLevel } from '../Components/enemies.js'
 import { EnemyCard } from '../Components/EnemyCard.js';
 import { PlayerCard } from '../Components/PlayerCard.js';
 import { Warrior, Healer, Mage, Rogue } from '../Components/subClasses.js';
+import next from 'next';
 
-// adding special attack/mana/recource of some kind
-// adding allies (healer, mage, worrior, ranger/rouge)
-
-// 8 max 4 on both sides
-
-// multiple enemies
 // mabey big boss at the end of each 25 rooms before endless mode of some kind
 // get random allie as the rooms go on
 // add diffrent fonts to players and enemies
@@ -24,7 +19,9 @@ import { Warrior, Healer, Mage, Rogue } from '../Components/subClasses.js';
 const rooms = () => {
     const classes = [Warrior, Healer, Mage, Rogue];
     const availableClasses = useRef([...classes]);
+    const initiativeOrder = useRef<(Player)[]>([]);
 
+    /*
     const [players, setPlayers] = useState(() => {
         const classes = availableClasses.current;
         const selectedIndex = Math.floor(Math.random() * classes.length);
@@ -33,13 +30,21 @@ const rooms = () => {
         availableClasses.current = classes;
         return [new PlayerClass()];
     });
-    const [enemies, setEnemies] = useState([generateEnemyBasedOnPlayerLevel(1)]);
+    */
+
+    const [players, setPlayers] = useState(() => {
+        return classes.map(PlayerClass => new PlayerClass());
+    });
+
+    const [enemies, setEnemies] = useState([generateEnemyBasedOnPlayerLevel(1), generateEnemyBasedOnPlayerLevel(1), generateEnemyBasedOnPlayerLevel(1), generateEnemyBasedOnPlayerLevel(1)]);
     const [roomNum, setRoomNum] = useState(1);
     const [floorNum, setFloorNum] = useState(1);
     const [turn, setTurn] = useState(1);
+    const [currentPlayer, setCurrentPlayer] = useState<Player | undefined>(undefined);
 
     const addPlayer = () => {
         const classes = availableClasses.current;
+        if (classes.length === 0) return;
         let selectedClass = Math.floor(Math.random() * classes.length);
         let newClass = new classes[selectedClass]();
         classes.splice(selectedClass, 1);
@@ -48,8 +53,38 @@ const rooms = () => {
     };
 
     const addEnemy = (newEnemy: any) => {
-        setEnemies(prevEnemies => [...prevEnemies, newEnemy]);
+        setEnemies([generateEnemyBasedOnPlayerLevel(players[0].level)]);
     };
+
+    const generateInitiativeOrder = () => {
+        const allCharacters = [...players];
+
+        for (let i = allCharacters.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [allCharacters[i], allCharacters[j]] = [allCharacters[j], allCharacters[i]];
+        }
+
+        initiativeOrder.current = allCharacters;
+        setCurrentPlayer(initiativeOrder.current[0]);
+    };
+
+    const nextPlayerTurn = () => {
+        initiativeOrder.current = initiativeOrder.current.filter(p => p !== currentPlayer);
+
+        if (initiativeOrder.current.length > 0) {
+            setCurrentPlayer(initiativeOrder.current[0]);
+        } else {
+            // TODO: Handle end of round / refill initiative order / game over, etc.
+            console.log("end of order")
+        }
+    };
+
+
+    useEffect(() => {
+        generateInitiativeOrder();
+    }, []);
+
+
 
     return (
         <div>
@@ -71,6 +106,8 @@ const rooms = () => {
                             enemies={enemies}
                             addPlayer={addPlayer}
                             styles={styles}
+                            currentPlayer={currentPlayer === player}
+                            nextPlayerTurn={nextPlayerTurn}
                         />
                     ))}
                 </div>
