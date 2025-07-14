@@ -21,11 +21,11 @@ export const PlayerCard = ({ player, enemies, addPlayer, styles, currentPlayer, 
             <div className={styles.playerInfo}>
                 <h2>{player.name}</h2>
                 <p>Level: {player.level}</p>
-                <div className={styles.healthWrapper}>
-                    <span className={styles.healthLabel}>HP</span>
+                <div className={styles.healthBarContainer}>
+                    <span className={styles.healthBarLabel}>HP</span>
                     <div className={styles.healthBarContainer}>
                         <div
-                            className={styles.healthBarFill}
+                            className={styles.healthBarProgress}
                             style={{
                                 width: `${healthPercent * 100}%`,
                                 backgroundColor: healthColor
@@ -38,11 +38,11 @@ export const PlayerCard = ({ player, enemies, addPlayer, styles, currentPlayer, 
                 </div>
                 <p>Attack: {player.attack}</p>
                 <p>Defense: {player.defense}</p>
-                <div className={styles.xpWrapper}>
-                    <span className={styles.xpLabel}>XP</span>
+                <div className={styles.xpBarContainer}>
+                    <span className={styles.xpBarLabel}>XP</span>
                     <div className={styles.xpBarContainer}>
                         <div
-                            className={styles.xpBarFill}
+                            className={styles.xpBarProgress}
                             style={{ width: `${(player.exp / player.nextLevelExp) * 100}%` }}
                         ></div>
                     </div>
@@ -50,8 +50,8 @@ export const PlayerCard = ({ player, enemies, addPlayer, styles, currentPlayer, 
                 <p>Gold: {player.gold}</p>
             </div>
             <div className={styles.playerActions}>
-                <button className={styles.attackButton} onClick={handleAttack}>Attack</button>
-                <button className={styles.defendButton} onClick={handleDefend}>Skills</button>
+                <button className={styles.attackButton} disabled={!currentPlayer} onClick={handleAttack}>Attack</button>
+                <button className={styles.defendButton} disabled={!currentPlayer} onClick={handleDefend}>Skills</button>
             </div>
         </div>
     );

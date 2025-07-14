@@ -52,13 +52,13 @@
     gap: 6px;
 }
 
-.healthWrapper {
+.healthBarContainer {
     display: flex;
     align-items: center;
     gap: 6px;
 }
 
-.healthLabel {
+.healthBarLabel {
     font-weight: bold;
     min-width: 24px;
 }
@@ -73,7 +73,7 @@
     image-rendering: pixelated;
 }
 
-.healthBarFill {
+.healthBarProgress {
     height: 100%;
     transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
 }
@@ -100,18 +100,18 @@
     bottom: -16px;
     pointer-events: none;
 
-    --s: 14px;
-    --t: 2px;
+    --size: 14px;
+    --thickness: 2px;
     --pulseMin: -4px;
     --pulseMax: -7px;
 
-    padding: var(--t);
-    outline: var(--t) solid white;
+    padding: var(--thickness);
+    outline: var(--thickness) solid white;
     outline-offset: var(--pulseMin);
     z-index: 1;
 
     mask:
-        conic-gradient(at var(--s) var(--s), #0000 75%, #000 0) 0 0 / calc(100% - var(--s)) calc(100% - var(--s)),
+        conic-gradient(at var(--size) var(--size), #0000 75%, #000 0) 0 0 / calc(100% - var(--size)) calc(100% - var(--size)),
         conic-gradient(#000 0 0) content-box;
     mask-composite: intersect;
     -webkit-mask-composite: destination-in;
@@ -132,13 +132,13 @@
     }
 }
 
-.xpWrapper {
+.xpBarContainer {
     display: flex;
     align-items: center;
     margin-top: 4px;
 }
 
-.xpLabel {
+.xpBarLabel {
     color: white;
     font-weight: bold;
     width: 30px;
@@ -156,7 +156,7 @@
     overflow: hidden;
 }
 
-.xpBarFill {
+.xpBarProgress {
     height: 100%;
     background-color: #4eff74;
     transition: width 0.3s ease-in-out;

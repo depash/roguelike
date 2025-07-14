@@ -9,11 +9,11 @@ export const EnemyCard = ({ enemy, styles }) => {
         <div className={styles.individualEnemyContainer}>
             <h1>Enemy: {enemy.name}</h1>
             <p>Level: {enemy.level}</p>
-            <div className={styles.healthWrapper}>
-                <span className={styles.healthLabel}>HP</span>
+            <div className={styles.healthBarContainer}>
+                <span className={styles.healthBarLabel}>HP</span>
                 <div className={styles.healthBarContainer}>
                     <div
-                        className={styles.healthBarFill}
+                        className={styles.healthBarProgress}
                         style={{
                             width: `${healthPercent * 100}%`,
                             backgroundColor: healthColor,
