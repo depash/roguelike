@@ -4,6 +4,7 @@ import { Player } from "./player";
 export const PlayerCard = ({ player, enemies, addPlayer, styles, currentPlayer, nextPlayerTurn }) => {
 
     const handleAttack = () => {
+
         nextPlayerTurn()
     };
 
@@ -40,7 +41,7 @@ export const PlayerCard = ({ player, enemies, addPlayer, styles, currentPlayer, 
                 <p>Defense: {player.defense}</p>
                 <div className={styles.xpBarContainer}>
                     <span className={styles.xpBarLabel}>XP</span>
-                    <div className={styles.xpBarContainer}>
+                    <div className={styles.xpBarWrapper}>
                         <div
                             className={styles.xpBarProgress}
                             style={{ width: `${(player.exp / player.nextLevelExp) * 100}%` }}

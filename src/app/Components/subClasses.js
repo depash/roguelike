@@ -47,6 +47,10 @@ export class Warrior extends Player {
             }
         ];
     }
+
+    healthPerLevel() { return 30; }
+    attackPerLevel() { return 2; }
+    defensePerLevel() { return 2; }
 }
 
 
@@ -79,6 +83,10 @@ export class Healer extends Player {
             }
         ];
     }
+
+    healthPerLevel() { return 15; }
+    attackPerLevel() { return 1; }
+    defensePerLevel() { return 1.5; }
 }
 
 
@@ -113,6 +121,10 @@ export class Mage extends Player {
             }
         ];
     }
+
+    healthPerLevel() { return 10; }
+    attackPerLevel() { return 3; }
+    defensePerLevel() { return 0.5; }
 }
 
 
@@ -147,6 +159,10 @@ export class Rogue extends Player {
             }
         ];
     }
+
+    healthPerLevel() { return 20; }
+    attackPerLevel() { return 2.5; }
+    defensePerLevel() { return 1; }
 }
 
 

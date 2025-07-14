@@ -4,9 +4,6 @@
 }
 
 .mainContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
     margin-top: 30px;
 }
 
@@ -33,7 +30,6 @@
     color: #fff;
     padding: 12px;
     border: 2px solid #888;
-    border-radius: 4px;
     width: fit-content;
     max-width: 350px;
     height: 250px;
@@ -42,8 +38,7 @@
     text-align: left;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    gap: 12px;
+    justify-content: space-around;
 }
 
 .playerInfo {
@@ -85,10 +80,6 @@
 
 .currentPlayerContainer {
     position: relative;
-    border: 2px solid #888;
-    padding: 12px;
-    background-color: #1a1a1a;
-    z-index: 0;
 }
 
 .currentPlayerContainer::before {
@@ -105,10 +96,7 @@
     --pulseMin: -4px;
     --pulseMax: -7px;
 
-    padding: var(--thickness);
     outline: var(--thickness) solid white;
-    outline-offset: var(--pulseMin);
-    z-index: 1;
 
     mask:
         conic-gradient(at var(--size) var(--size), #0000 75%, #000 0) 0 0 / calc(100% - var(--size)) calc(100% - var(--size)),
@@ -117,7 +105,6 @@
     -webkit-mask-composite: destination-in;
 
     animation: jrpgPulse 2.2s ease-in-out infinite;
-    transition: outline-offset 0.15s ease-out;
 }
 
 @keyframes jrpgPulse {
@@ -139,20 +126,15 @@
 }
 
 .xpBarLabel {
-    color: white;
     font-weight: bold;
     width: 30px;
-    text-shadow: 0 0 2px black;
 }
 
-.xpBarContainer {
-    position: relative;
+.xpBarWrapper {
     width: 120px;
     height: 6px;
     background-color: #111;
     border: 1px solid #555;
-    box-shadow: inset 0 0 2px #000;
-    border-radius: 2px;
     overflow: hidden;
 }
 
@@ -163,10 +145,8 @@
 }
 
 .playerActions {
-    margin-top: 12px;
     display: flex;
     justify-content: space-between;
-    gap: 8px;
 }
 
 .attackButton {
@@ -178,7 +158,6 @@
     font-weight: bold;
     font-size: 11px;
     font-family: var(--font-press-start);
-    border-radius: 0;
     cursor: pointer;
     transition: transform 0.1s ease-in-out;
 }
@@ -202,7 +181,6 @@
     font-weight: bold;
     font-size: 11px;
     font-family: var(--font-press-start);
-    border-radius: 0;
     cursor: pointer;
     transition: transform 0.1s ease-in-out;
 }
