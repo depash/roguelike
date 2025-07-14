@@ -63,7 +63,7 @@
     min-width: 24px;
 }
 
-.healthBarContainer {
+.healthBarWrapper {
     position: relative;
     width: 100px;
     height: 8px;

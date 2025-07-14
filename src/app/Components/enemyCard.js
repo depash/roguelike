@@ -11,7 +11,7 @@ export const EnemyCard = ({ enemy, styles }) => {
             <p>Level: {enemy.level}</p>
             <div className={styles.healthBarContainer}>
                 <span className={styles.healthBarLabel}>HP</span>
-                <div className={styles.healthBarContainer}>
+                <div className={styles.healthBarWrapper}>
                     <div
                         className={styles.healthBarProgress}
                         style={{
