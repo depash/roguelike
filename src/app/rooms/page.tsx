@@ -41,6 +41,8 @@ const rooms = () => {
     const [floorNum, setFloorNum] = useState(1);
     const [turn, setTurn] = useState(1);
     const [currentPlayer, setCurrentPlayer] = useState<Player | undefined>(undefined);
+    const [attacking, setAttacking] = useState(false);
+    const [atackingPlayer, setAtackingPlayer] = useState<Player | undefined>(undefined);
 
     const addPlayer = () => {
         const classes = availableClasses.current;
@@ -58,12 +60,6 @@ const rooms = () => {
 
     const generateInitiativeOrder = () => {
         const allCharacters = [...players];
-
-        for (let i = allCharacters.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [allCharacters[i], allCharacters[j]] = [allCharacters[j], allCharacters[i]];
-        }
-
         initiativeOrder.current = allCharacters;
         setCurrentPlayer(initiativeOrder.current[0]);
     };
@@ -79,12 +75,44 @@ const rooms = () => {
         }
     };
 
+    const handleAttackClicked = (player: Player) => {
+        setAttacking(true);
+        setAtackingPlayer(player)
+    };
+
+    const handleEnemyAttack = (enemy: Enemy, index: number) => {
+        const updatedEnemy = enemies[index].takeDamage(atackingPlayer?.attack);
+        const updatedEnemies = [...enemies];
+        updatedEnemies[index] = updatedEnemy;
+
+        if (updatedEnemy.currentHealth <= 0) {
+            const { gold, exp } = enemies[index].die();
+
+            let updatedPlayers = players.map((player) => {
+                let updatedPlayer = player;
+
+                updatedPlayer.gold += gold;
+                updatedPlayer.exp += exp;
+
+                if (player.exp >= player.nextLevelExp) {
+                    updatedPlayer = player.levelUp()
+                }
+
+                return updatedPlayer;
+            });
+
+            setPlayers([...updatedPlayers]);
+        }
+
+        setEnemies(updatedEnemies);
+        setAtackingPlayer(undefined);
+        setAttacking(false);
+        nextPlayerTurn();
+    };
 
     useEffect(() => {
         generateInitiativeOrder();
     }, []);
-
-
 
     return (
         <div>
@@ -94,7 +122,7 @@ const rooms = () => {
             <div className={styles.mainContainer}>
                 <div className={styles.enemiesContainer}>
                     {enemies.map((enemy, index) => (
-                        <EnemyCard key={index} enemy={enemy} styles={styles} />
+                        <EnemyCard key={index} enemyIndex={index} enemy={enemy} styles={styles} attacking={attacking} handleEnemyAttack={handleEnemyAttack} />
                     ))}
                 </div>
 
@@ -106,8 +134,8 @@ const rooms = () => {
                             enemies={enemies}
                             addPlayer={addPlayer}
                             styles={styles}
-                            currentPlayer={currentPlayer === player}
-                            nextPlayerTurn={nextPlayerTurn}
+                            currentPlayer={currentPlayer?.name === player.name}
+                            handleAttackClicked={handleAttackClicked}
                         />
                     ))}
                 </div>

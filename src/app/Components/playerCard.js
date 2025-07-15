@@ -1,13 +1,7 @@
 import { generateEnemyBasedOnPlayerLevel } from "./enemies";
 import { Player } from "./player";
 
-export const PlayerCard = ({ player, enemies, addPlayer, styles, currentPlayer, nextPlayerTurn }) => {
-
-    const handleAttack = () => {
-
-        nextPlayerTurn()
-    };
-
+export const PlayerCard = ({ player, enemies, addPlayer, styles, currentPlayer, handleAttackClicked }) => {
     const handleDefend = () => {
     };
 
@@ -51,7 +45,7 @@ export const PlayerCard = ({ player, enemies, addPlayer, styles, currentPlayer, 
                 <p>Gold: {player.gold}</p>
             </div>
             <div className={styles.playerActions}>
-                <button className={styles.attackButton} disabled={!currentPlayer} onClick={handleAttack}>Attack</button>
+                <button className={styles.attackButton} disabled={!currentPlayer} onClick={() => handleAttackClicked(player)}>Attack</button>
                 <button className={styles.defendButton} disabled={!currentPlayer} onClick={handleDefend}>Skills</button>
             </div>
         </div>
