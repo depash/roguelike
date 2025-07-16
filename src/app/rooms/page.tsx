@@ -39,10 +39,11 @@ const rooms = () => {
     const [enemies, setEnemies] = useState([generateEnemyBasedOnPlayerLevel(1), generateEnemyBasedOnPlayerLevel(1), generateEnemyBasedOnPlayerLevel(1), generateEnemyBasedOnPlayerLevel(1)]);
     const [roomNum, setRoomNum] = useState(1);
     const [floorNum, setFloorNum] = useState(1);
-    const [turn, setTurn] = useState(1);
     const [currentPlayer, setCurrentPlayer] = useState<Player | undefined>(undefined);
     const [attacking, setAttacking] = useState(false);
     const [atackingPlayer, setAtackingPlayer] = useState<Player | undefined>(undefined);
+
+    const aliveEnemies = useRef<Enemy[]>([...enemies]);
 
     const addPlayer = () => {
         const classes = availableClasses.current;
@@ -54,10 +55,6 @@ const rooms = () => {
         setPlayers(prevPlayers => [...prevPlayers, newClass]);
     };
 
-    const addEnemy = (newEnemy: any) => {
-        setEnemies([generateEnemyBasedOnPlayerLevel(players[0].level)]);
-    };
-
     const generateInitiativeOrder = () => {
         const allCharacters = [...players];
         initiativeOrder.current = allCharacters;
@@ -67,11 +64,24 @@ const rooms = () => {
     const nextPlayerTurn = () => {
         initiativeOrder.current = initiativeOrder.current.filter(p => p !== currentPlayer);
 
-        if (initiativeOrder.current.length > 0) {
+        if (initiativeOrder.current.length) {
             setCurrentPlayer(initiativeOrder.current[0]);
-        } else {
-            // TODO: Handle end of round / refill initiative order / game over, etc.
-            console.log("end of order")
+        }
+        else {
+            generateInitiativeOrder();
+        }
+
+        if (aliveEnemies.current.length > 0) {
+            //TODO: add enemy turn
+        }
+        else {
+            setRoomNum(prevRoomNum => prevRoomNum + 1);
+            if (roomNum % (floorNum * 5) === 0) {
+                setFloorNum(prevFloorNum => prevFloorNum + 1);
+                setRoomNum(1)
+            }
+            setEnemies([generateEnemyBasedOnPlayerLevel(players[0].level), generateEnemyBasedOnPlayerLevel(players[0].level), generateEnemyBasedOnPlayerLevel(players[0].level), generateEnemyBasedOnPlayerLevel(players[0].level)]);
+            aliveEnemies.current = [...enemies];
         }
     };
 
@@ -87,6 +97,8 @@ const rooms = () => {
 
         if (updatedEnemy.currentHealth <= 0) {
             const { gold, exp } = enemies[index].die();
+
+            aliveEnemies.current = updatedEnemies.filter(e => e.isAlive);
 
             let updatedPlayers = players.map((player) => {
                 let updatedPlayer = player;
