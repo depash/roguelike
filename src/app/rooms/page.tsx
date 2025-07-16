@@ -68,13 +68,26 @@ const rooms = () => {
             setCurrentPlayer(initiativeOrder.current[0]);
         }
         else {
+            let enemyDamage = []
+            for (let i = 0; i < aliveEnemies.current.length; i++) {
+                const enemy = aliveEnemies.current[i];
+                enemyDamage.push(enemy.attack);
+            }
+
+            const updatedPlayers = [...players];
+
+            enemyDamage.forEach((damage) => {
+                let randomPlayer = Math.floor(Math.random() * players.length);
+
+                updatedPlayers[randomPlayer] = updatedPlayers[randomPlayer].takeDamage(damage);
+            })
+
+            setPlayers([...updatedPlayers]);
+
             generateInitiativeOrder();
         }
 
-        if (aliveEnemies.current.length > 0) {
-            //TODO: add enemy turn
-        }
-        else {
+        if (!aliveEnemies.current.length) {
             setRoomNum(prevRoomNum => prevRoomNum + 1);
             if (roomNum % (floorNum * 5) === 0) {
                 setFloorNum(prevFloorNum => prevFloorNum + 1);

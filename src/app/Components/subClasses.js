@@ -21,7 +21,7 @@ import { Player } from './player.js';
 
 export class Warrior extends Player {
     constructor(name = 'Warrior') {
-        super(name, 1, 120, 500, 5);
+        super(name, 1, 120, 8, 5);
         this.skills = [
             {
                 name: 'Taunt',
@@ -56,7 +56,7 @@ export class Warrior extends Player {
 
 export class Healer extends Player {
     constructor(name = 'Healer') {
-        super(name, 1, 90, 500, 3);
+        super(name, 1, 90, 4, 3);
         this.skills = [
             {
                 name: 'Group Heal',
@@ -93,7 +93,7 @@ export class Healer extends Player {
 
 export class Mage extends Player {
     constructor(name = 'Mage') {
-        super(name, 1, 80, 500, 2);
+        super(name, 1, 80, 10, 2);
         this.skills = [
             {
                 name: 'Firestorm',
@@ -131,7 +131,7 @@ export class Mage extends Player {
 
 export class Rogue extends Player {
     constructor(name = 'Rogue') {
-        super(name, 1, 100, 500, 3);
+        super(name, 1, 100, 7, 3);
         this.skills = [
             {
                 name: 'Poison Dagger',
