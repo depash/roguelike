@@ -26,24 +26,23 @@ export class Warrior extends Player {
             {
                 name: 'Taunt',
                 type: 'effect',
-                target: 'allEnemies',
+                aoe: true,
                 cooldown: 0,
-                use: () => { }
+                turns: 2,
             },
             {
                 name: 'Shield Bash',
                 type: 'attack',
                 damage: 14,
-                target: 'enemy',
-                cooldown: 1,
-                use: () => { }
+                aoe: false,
+                cooldown: 2,
             },
             {
                 name: 'Bulwark',
                 type: 'effect',
                 target: 'self',
+                turns: 3,
                 cooldown: 0,
-                use: () => { }
             }
         ];
     }
@@ -62,24 +61,21 @@ export class Healer extends Player {
                 name: 'Group Heal',
                 type: 'heal',
                 healing: 15,
-                target: 'allAllies',
-                cooldown: 2,
-                use: () => { }
+                aoe: true,
+                cooldown: 4,
             },
             {
                 name: 'Single Heal',
                 type: 'heal',
                 healing: 25,
-                target: 'ally',
-                cooldown: 1,
-                use: () => { }
+                aoe: false,
+                cooldown: 3,
             },
             {
                 name: 'Purify',
                 type: 'effect',
                 target: 'ally',
-                cooldown: 2,
-                use: () => { }
+                cooldown: 3,
             }
         ];
     }
@@ -98,26 +94,25 @@ export class Mage extends Player {
             {
                 name: 'Firestorm',
                 type: 'attack',
-                damage: 10,
-                target: 'allEnemies',
-                cooldown: 2,
-                use: () => { }
+                damage: 15,
+                aoe: true,
+                cooldown: 3,
             },
             {
                 name: 'Stun Bolt',
                 type: 'attack',
                 damage: 8,
                 chance: 80,
-                target: 'enemy',
+                aoe: false,
                 cooldown: 1,
-                use: () => { }
+                turns: 1,
             },
             {
                 name: 'Arcane Empowerment',
                 type: 'effect',
                 target: 'self',
                 cooldown: 3,
-                use: () => { }
+                turns: 3,
             }
         ];
     }
@@ -138,24 +133,23 @@ export class Rogue extends Player {
                 type: 'attack',
                 damage: 6,
                 chance: 100,
-                target: 'enemy',
+                aoe: false,
                 cooldown: 1,
-                use: () => { }
+                turns: 3,
             },
             {
                 name: 'Backstab',
                 type: 'attack',
                 damage: 18,
-                target: 'enemy',
-                cooldown: 2,
-                use: () => { }
+                aoe: false,
+                cooldown: 3,
             },
             {
                 name: 'Expose Weakness',
                 type: 'effect',
                 target: 'enemy',
                 cooldown: 2,
-                use: () => { }
+                turns: 2,
             }
         ];
     }

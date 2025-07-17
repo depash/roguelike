@@ -1,6 +1,7 @@
-import { useState } from "react";
+import styles from "./enemyCard.module.css";
+import shared from "./shared.module.css";
 
-export const EnemyCard = ({ enemyIndex, enemy, styles, attacking, handleEnemyAttack }) => {
+export const EnemyCard = ({ enemyIndex, enemy, actionType, handleEnemyAttack, aoe }) => {
     const healthPercent = enemy.currentHealth / enemy.maxHealth;
     let healthColor = "#00cc66";
     if (healthPercent <= 0.5) healthColor = "#ffcc00";
@@ -8,23 +9,28 @@ export const EnemyCard = ({ enemyIndex, enemy, styles, attacking, handleEnemyAtt
 
     return (
         <div
-            className={`${styles.individualEnemyContainer} ${attacking && enemy.isAlive ? styles.selectedEnemy : ""} ${!enemy.isAlive ? styles.enemyDead : ""}`}
-            onClick={() => { attacking && enemy.isAlive ? handleEnemyAttack(enemy, enemyIndex) : "" }}
+            className={`
+                ${styles.individualEnemyContainer} 
+                ${actionType === "attack" && enemy.isAlive && aoe ? styles.enemySelectableAoe : null} 
+                ${actionType === "attack" && enemy.isAlive && !aoe ? styles.enemySelectable : null} 
+                ${!enemy.isAlive ? styles.enemyDead : null}
+                `}
+            onClick={() => { actionType === "attack" && enemy.isAlive ? handleEnemyAttack(enemyIndex) : null }}
         >
             <h1>Enemy: {enemy.name}</h1>
             <p>Level: {enemy.level}</p>
-            <div className={styles.healthBarContainer}>
-                <span className={styles.healthBarLabel}>HP</span>
-                <div className={styles.healthBarWrapper}>
+            <div className={shared.healthBarContainer}>
+                <span className={shared.healthBarLabel}>HP</span>
+                <div className={shared.healthBarWrapper}>
                     <div
-                        className={styles.healthBarProgress}
+                        className={shared.healthBarProgress}
                         style={{
                             width: `${healthPercent * 100}%`,
                             backgroundColor: healthColor,
                         }}
                     ></div>
                 </div>
-                <span className={styles.healthNumbers}>
+                <span className={shared.healthNumbers}>
                     {enemy.currentHealth} / {enemy.maxHealth}
                 </span>
             </div>

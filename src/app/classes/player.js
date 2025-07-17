@@ -43,6 +43,15 @@ export class Player {
         return clone;
     }
 
+    heal(heal) {
+        const clone = this.clone();
+        clone.currentHealth += heal;
+        if (clone.currentHealth > clone.maxHealth) {
+            clone.currentHealth = clone.maxHealth;
+        }
+        return clone;
+    }
+
     addBuff({ attack = 0, defense = 0 }) {
         this.bonusAttack += attack;
         this.bonusDefense += defense;

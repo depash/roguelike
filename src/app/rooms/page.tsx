@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react'
 import styles from "./page.module.css";
-import { Player } from '../Components/player.js'
-import { Enemy, generateEnemyBasedOnPlayerLevel } from '../Components/enemies.js'
-import { EnemyCard } from '../Components/EnemyCard.js';
-import { PlayerCard } from '../Components/PlayerCard.js';
-import { Warrior, Healer, Mage, Rogue } from '../Components/subClasses.js';
+import { Player } from '../classes/player.js'
+import { Enemy, generateEnemyBasedOnPlayerLevel } from '../classes/enemies.js'
+import { EnemyCard } from '../components/EnemyCard.js';
+import { PlayerCard } from '../components/PlayerCard.js';
+import { Warrior, Healer, Mage, Rogue } from '../classes/subClasses.js';
 import next from 'next';
 
 // mabey big boss at the end of each 25 rooms before endless mode of some kind
@@ -20,17 +20,7 @@ const rooms = () => {
     const classes = [Warrior, Healer, Mage, Rogue];
     const availableClasses = useRef([...classes]);
     const initiativeOrder = useRef<(Player)[]>([]);
-
-    /*
-    const [players, setPlayers] = useState(() => {
-        const classes = availableClasses.current;
-        const selectedIndex = Math.floor(Math.random() * classes.length);
-        const PlayerClass = classes[selectedIndex];
-        classes.splice(selectedIndex, 1);
-        availableClasses.current = classes;
-        return [new PlayerClass()];
-    });
-    */
+    type ActionType = "attack" | "heal" | "none";
 
     const [players, setPlayers] = useState(() => {
         return classes.map(PlayerClass => new PlayerClass());
@@ -40,8 +30,12 @@ const rooms = () => {
     const [roomNum, setRoomNum] = useState(1);
     const [floorNum, setFloorNum] = useState(1);
     const [currentPlayer, setCurrentPlayer] = useState<Player | undefined>(undefined);
-    const [attacking, setAttacking] = useState(false);
-    const [atackingPlayer, setAtackingPlayer] = useState<Player | undefined>(undefined);
+    const [cooldowns, setCooldowns] = useState<{ [key: string]: number }[]>([]);
+    const [actionType, setActionType] = useState<ActionType>("none");
+    const [damage, setDamage] = useState<number | undefined>();
+    const [healAmount, setHealAmount] = useState<number | undefined>();
+    const [aoe, setAoe] = useState<boolean>(false);
+
 
     const aliveEnemies = useRef<Enemy[]>([...enemies]);
 
@@ -84,6 +78,14 @@ const rooms = () => {
 
             setPlayers([...updatedPlayers]);
 
+            const updated = cooldowns.map(obj => {
+                const [skill, cooldown] = Object.entries(obj)[0];
+                const newValue = (cooldown as number) - 1;
+                return newValue > 0 ? { [skill]: newValue } : null;
+            }).filter((item): item is { [key: string]: number } => item !== null);
+
+            setCooldowns(updated);
+
             generateInitiativeOrder();
         }
 
@@ -98,40 +100,102 @@ const rooms = () => {
         }
     };
 
-    const handleAttackClicked = (player: Player) => {
-        setAttacking(true);
-        setAtackingPlayer(player)
+    const handleAttackClicked = (damage: number, aoe: boolean, skill?: any) => {
+        setActionType("attack");
+        setDamage(damage);
+        setAoe(aoe);
+        setHealAmount(undefined);
+
+        if (skill) {
+            setCooldowns(prev => [...prev, { [skill.name]: skill.cooldown }]);
+        }
     };
 
-    const handleEnemyAttack = (enemy: Enemy, index: number) => {
-        const updatedEnemy = enemies[index].takeDamage(atackingPlayer?.attack);
-        const updatedEnemies = [...enemies];
-        updatedEnemies[index] = updatedEnemy;
 
-        if (updatedEnemy.currentHealth <= 0) {
-            const { gold, exp } = enemies[index].die();
+    const handleHealClicked = (skill: any) => {
+        setActionType("heal");
+        setHealAmount(skill.healing);
+        setAoe(skill.aoe);
+        setDamage(undefined);
+
+        setCooldowns(prev => [...prev, { [skill.name]: skill.cooldown }]);
+    };
+
+
+    const handleEnemyAttack = (index: number) => {
+        let updatedEnemies = [...enemies];
+        let totalGold = 0;
+        let totalExp = 0;
+
+        if (aoe) {
+            updatedEnemies = updatedEnemies.map((enemy) => {
+                if (!enemy.isAlive) return enemy;
+
+                const damagedEnemy = enemy.takeDamage(damage);
+
+                if (damagedEnemy.currentHealth <= 0) {
+                    const { gold, exp } = enemy.die();
+                    totalGold += gold;
+                    totalExp += exp;
+                    return { ...damagedEnemy, isAlive: false }; // assuming die() mutates
+                }
+
+                return damagedEnemy;
+            });
 
             aliveEnemies.current = updatedEnemies.filter(e => e.isAlive);
+        } else {
+            const updatedEnemy = enemies[index].takeDamage(damage);
+            updatedEnemies[index] = updatedEnemy;
 
-            let updatedPlayers = players.map((player) => {
+            if (updatedEnemy.currentHealth <= 0) {
+                const { gold, exp } = enemies[index].die();
+                totalGold = gold;
+                totalExp = exp;
+
+                aliveEnemies.current = updatedEnemies.filter(e => e.isAlive);
+            }
+        }
+
+        if (totalGold > 0 || totalExp > 0) {
+            const updatedPlayers = players.map((player) => {
                 let updatedPlayer = player;
+                updatedPlayer.gold += totalGold;
+                updatedPlayer.exp += totalExp;
 
-                updatedPlayer.gold += gold;
-                updatedPlayer.exp += exp;
-
-                if (player.exp >= player.nextLevelExp) {
-                    updatedPlayer = player.levelUp()
+                if (updatedPlayer.exp >= updatedPlayer.nextLevelExp) {
+                    updatedPlayer = updatedPlayer.levelUp(); // ensure levelUp returns a new Player
                 }
 
                 return updatedPlayer;
             });
 
-            setPlayers([...updatedPlayers]);
+            setPlayers(updatedPlayers);
         }
 
         setEnemies(updatedEnemies);
-        setAtackingPlayer(undefined);
-        setAttacking(false);
+        setActionType("none");
+        setDamage(undefined);
+        nextPlayerTurn();
+    };
+
+    const handlePlayerHeal = (index: number) => {
+        let updatedPlayers = [...players];
+
+        if (aoe) {
+            updatedPlayers = updatedPlayers.map(player => {
+                return player.isAlive ? player.heal(healAmount) : player;
+            });
+        } else {
+            const playerToHeal = players[index];
+            if (playerToHeal.isAlive) {
+                updatedPlayers[index] = playerToHeal.heal(healAmount);
+            }
+        }
+
+        setPlayers(updatedPlayers);
+        setActionType("none");
+        setHealAmount(undefined);
         nextPlayerTurn();
     };
 
@@ -147,7 +211,14 @@ const rooms = () => {
             <div className={styles.mainContainer}>
                 <div className={styles.enemiesContainer}>
                     {enemies.map((enemy, index) => (
-                        <EnemyCard key={index} enemyIndex={index} enemy={enemy} styles={styles} attacking={attacking} handleEnemyAttack={handleEnemyAttack} />
+                        <EnemyCard
+                            key={index}
+                            enemyIndex={index}
+                            enemy={enemy}
+                            actionType={actionType}
+                            handleEnemyAttack={handleEnemyAttack}
+                            aoe={aoe}
+                        />
                     ))}
                 </div>
 
@@ -155,12 +226,18 @@ const rooms = () => {
                     {players.map((player, index) => (
                         <PlayerCard
                             key={index}
+                            playerIndex={index}
                             player={player}
                             enemies={enemies}
                             addPlayer={addPlayer}
-                            styles={styles}
                             currentPlayer={currentPlayer?.name === player.name}
                             handleAttackClicked={handleAttackClicked}
+                            cooldowns={cooldowns}
+                            setCooldowns={setCooldowns}
+                            actionType={actionType}
+                            handleHealClicked={handleHealClicked}
+                            handlePlayerHeal={handlePlayerHeal}
+                            aoe={aoe}
                         />
                     ))}
                 </div>
