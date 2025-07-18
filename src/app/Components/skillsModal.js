@@ -1,6 +1,6 @@
 import styles from "./skillsModal.module.css";
 
-export const SkillsModal = ({ player, closeSkills, handleAttackClicked, cooldowns, setCooldowns, handleHealClicked }) => {
+export const SkillsModal = ({ player, closeSkills, cooldowns, handleAttackClicked, handleHealClicked, handleBuffClicked, handleEffectClicked }) => {
     return (
         <>
             <div className={styles.modalBackdrop} onClick={closeSkills}></div>
@@ -11,23 +11,40 @@ export const SkillsModal = ({ player, closeSkills, handleAttackClicked, cooldown
                         <li key={index} className={styles.skillItem} onClick={(e) => {
                             e.stopPropagation();
                             if (skill.type === 'attack') {
-                                let isOnCooldown = cooldowns.findIndex(cooldowns => cooldowns[skill.name]);
-                                if (isOnCooldown === -1) {
+                                const turnsLeft = cooldowns.get(skill.name);
+                                if (turnsLeft === undefined) {
                                     handleAttackClicked(skill.damage, skill.aoe, skill);
                                     closeSkills();
                                 }
                                 else {
-                                    alert(`Skill ${skill.name} is on cooldown for ${cooldowns[isOnCooldown][skill.name]} turns!`);
+                                    alert(`Skill ${skill.name} is on cooldown for ${turnsLeft} turns!`);
                                 }
                             }
                             else if (skill.type === 'heal') {
-                                let isOnCooldown = cooldowns.findIndex(cooldowns => cooldowns[skill.name]);
-                                if (isOnCooldown === -1) {
+                                const turnsLeft = cooldowns.get(skill.name);
+                                if (turnsLeft === undefined) {
                                     handleHealClicked(skill);
                                     closeSkills();
                                 }
                                 else {
-                                    alert(`Skill ${skill.name} is on cooldown for ${cooldowns[isOnCooldown][skill.name]} turns!`);
+                                    alert(`Skill ${skill.name} is on cooldown for ${turnsLeft} turns!`);
+                                }
+                            }
+                            else if (skill.type === 'effect') {
+                                const turnsLeft = cooldowns.get(skill.name);
+                                if (turnsLeft === undefined) {
+                                    handleEffectClicked(skill);
+                                    closeSkills();
+                                } else {
+                                    alert(`Skill ${skill.name} is on cooldown for ${turnsLeft} turns!`);
+                                }
+                            } else if (skill.type === 'buff') {
+                                const turnsLeft = cooldowns.get(skill.name);
+                                if (turnsLeft === undefined) {
+                                    handleBuffClicked(skill);
+                                    closeSkills();
+                                } else {
+                                    alert(`Skill ${skill.name} is on cooldown for ${turnsLeft} turns!`);
                                 }
                             }
                         }}>

@@ -6,7 +6,6 @@ import { Enemy, generateEnemyBasedOnPlayerLevel } from '../classes/enemies.js'
 import { EnemyCard } from '../components/EnemyCard.js';
 import { PlayerCard } from '../components/PlayerCard.js';
 import { Warrior, Healer, Mage, Rogue } from '../classes/subClasses.js';
-import next from 'next';
 
 // mabey big boss at the end of each 25 rooms before endless mode of some kind
 // get random allie as the rooms go on
@@ -20,7 +19,7 @@ const rooms = () => {
     const classes = [Warrior, Healer, Mage, Rogue];
     const availableClasses = useRef([...classes]);
     const initiativeOrder = useRef<(Player)[]>([]);
-    type ActionType = "attack" | "heal" | "none";
+    type ActionType = "attack" | "heal" | "effect" | "buff" | "none";
 
     const [players, setPlayers] = useState(() => {
         return classes.map(PlayerClass => new PlayerClass());
@@ -30,14 +29,21 @@ const rooms = () => {
     const [roomNum, setRoomNum] = useState(1);
     const [floorNum, setFloorNum] = useState(1);
     const [currentPlayer, setCurrentPlayer] = useState<Player | undefined>(undefined);
-    const [cooldowns, setCooldowns] = useState<{ [key: string]: number }[]>([]);
+    const [cooldowns, setCooldowns] = useState(new Map<string, number>());
     const [actionType, setActionType] = useState<ActionType>("none");
     const [damage, setDamage] = useState<number | undefined>();
     const [healAmount, setHealAmount] = useState<number | undefined>();
-    const [skillMeta, setSkillMeta] = useState<{ name: string; cooldown: number } | null>(null);
+    const [skillMeta, setSkillMeta] = useState<{
+        name: string;
+        cooldown: number;
+        turns?: number;
+        attack?: number;
+        defense?: number;
+        target?: string;
+        effectType?: string;
+        ignoresDefense?: boolean;
+    } | null>(null);
     const [aoe, setAoe] = useState<boolean>(false);
-
-
     const aliveEnemies = useRef<Enemy[]>([...enemies]);
 
     const addPlayer = () => {
@@ -56,36 +62,56 @@ const rooms = () => {
         setCurrentPlayer(initiativeOrder.current[0]);
     };
 
-    const nextPlayerTurn = () => {
+    const nextPlayerTurn = (enemies: Enemy[]) => {
         initiativeOrder.current = initiativeOrder.current.filter(p => p !== currentPlayer);
+
+        const enemiesWithEffectsApplied = enemies.map(e => {
+            if (e.isAlive) {
+                e.applyEffects();
+            }
+            return e;
+        });
 
         if (initiativeOrder.current.length) {
             setCurrentPlayer(initiativeOrder.current[0]);
-        }
-        else {
-            let enemyDamage = []
-            for (let i = 0; i < aliveEnemies.current.length; i++) {
-                const enemy = aliveEnemies.current[i];
-                enemyDamage.push(enemy.attack);
+        } else {
+            const damagedPlayers = [...players];
+
+            const warriorIndex = players.findIndex(p => p.name === "Warrior" && p.currentHealth > 0);
+            const warriorExists = warriorIndex !== -1;
+
+            for (const enemy of enemiesWithEffectsApplied) {
+                if (enemy.hasEffect("stun")) continue;
+
+                let targetIndex;
+
+                if (enemy.hasEffect("taunt") && warriorExists) {
+                    targetIndex = warriorIndex;
+                } else {
+                    targetIndex = Math.floor(Math.random() * players.length);
+                }
+
+                if (targetIndex !== -1) {
+                    damagedPlayers[targetIndex] = damagedPlayers[targetIndex].takeDamage(enemy.attack - damagedPlayers[targetIndex].defense);
+                }
             }
 
-            const updatedPlayers = [...players];
+            setPlayers(damagedPlayers);
 
-            enemyDamage.forEach((damage) => {
-                let randomPlayer = Math.floor(Math.random() * players.length);
+            setCooldowns(prev => {
+                const newMap = new Map<string, number>();
+                for (const [skill, value] of prev.entries()) {
+                    const newValue = value - 1;
+                    if (newValue > 0) {
+                        newMap.set(skill, newValue);
+                    }
+                }
+                return newMap;
+            });
 
-                updatedPlayers[randomPlayer] = updatedPlayers[randomPlayer].takeDamage(damage);
-            })
-
-            setPlayers([...updatedPlayers]);
-
-            const updated = cooldowns.map(obj => {
-                const [skill, cooldown] = Object.entries(obj)[0];
-                const newValue = (cooldown as number) - 1;
-                return newValue > 0 ? { [skill]: newValue } : null;
-            }).filter((item): item is { [key: string]: number } => item !== null);
-
-            setCooldowns(updated);
+            const updatedEnemies = enemiesWithEffectsApplied.map(e => e.tickEffects());
+            aliveEnemies.current = updatedEnemies.filter(e => e.isAlive);
+            setEnemies(updatedEnemies);
 
             generateInitiativeOrder();
         }
@@ -93,11 +119,19 @@ const rooms = () => {
         if (!aliveEnemies.current.length) {
             setRoomNum(prevRoomNum => prevRoomNum + 1);
             if (roomNum % (floorNum * 5) === 0) {
-                setFloorNum(prevFloorNum => prevFloorNum + 1);
-                setRoomNum(1)
+                setFloorNum(prev => prev + 1);
+                setRoomNum(1);
             }
-            setEnemies([generateEnemyBasedOnPlayerLevel(players[0].level), generateEnemyBasedOnPlayerLevel(players[0].level), generateEnemyBasedOnPlayerLevel(players[0].level), generateEnemyBasedOnPlayerLevel(players[0].level)]);
-            aliveEnemies.current = [...enemies];
+
+            const newEnemies = [
+                generateEnemyBasedOnPlayerLevel(players[0].level),
+                generateEnemyBasedOnPlayerLevel(players[0].level),
+                generateEnemyBasedOnPlayerLevel(players[0].level),
+                generateEnemyBasedOnPlayerLevel(players[0].level)
+            ];
+
+            setEnemies(newEnemies);
+            aliveEnemies.current = newEnemies;
         }
     };
 
@@ -108,7 +142,7 @@ const rooms = () => {
         setHealAmount(undefined);
 
         if (skill) {
-            setSkillMeta({ name: skill.name, cooldown: skill.cooldown });
+            setSkillMeta({ name: skill.name, cooldown: skill.cooldown, ignoresDefense: skill.ignoresDefense ?? false });
         } else {
             setSkillMeta(null);
         }
@@ -123,72 +157,46 @@ const rooms = () => {
         setSkillMeta({ name: skill.name, cooldown: skill.cooldown });
     };
 
-    const handleEnemyAttack = (index: number) => {
-        let updatedEnemies = [...enemies];
-        let totalGold = 0;
-        let totalExp = 0;
+    const handleEffectClicked = (skill: any) => {
+        setActionType("effect");
 
-        if (skillMeta) {
-            setCooldowns(prev => [...prev, { [skillMeta.name]: skillMeta.cooldown }]);
-        }
+        setDamage(skill.damage ?? undefined);
+        setHealAmount(undefined);
+        setAoe(skill.aoe ?? false);
 
-        if (aoe) {
-            updatedEnemies = updatedEnemies.map((enemy) => {
-                if (!enemy.isAlive) return enemy;
+        setSkillMeta({
+            name: skill.name,
+            cooldown: skill.cooldown ?? 0,
+            turns: skill.turns ?? 1,
+            effectType: skill.effectType ?? skill.name.toLowerCase(),
+        });
+    };
 
-                const damagedEnemy = enemy.takeDamage(damage);
-
-                if (damagedEnemy.currentHealth <= 0) {
-                    const { gold, exp } = enemy.die();
-                    totalGold += gold;
-                    totalExp += exp;
-                    return { ...damagedEnemy, isAlive: false }; // assuming die() mutates
-                }
-
-                return damagedEnemy;
-            });
-
-            aliveEnemies.current = updatedEnemies.filter(e => e.isAlive);
-        } else {
-            const updatedEnemy = enemies[index].takeDamage(damage);
-            updatedEnemies[index] = updatedEnemy;
-
-            if (updatedEnemy.currentHealth <= 0) {
-                const { gold, exp } = enemies[index].die();
-                totalGold = gold;
-                totalExp = exp;
-
-                aliveEnemies.current = updatedEnemies.filter(e => e.isAlive);
-            }
-        }
-
-        if (totalGold > 0 || totalExp > 0) {
-            const updatedPlayers = players.map((player) => {
-                let updatedPlayer = player;
-                updatedPlayer.gold += totalGold;
-                updatedPlayer.exp += totalExp;
-
-                if (updatedPlayer.exp >= updatedPlayer.nextLevelExp) {
-                    updatedPlayer = updatedPlayer.levelUp(); // ensure levelUp returns a new Player
-                }
-
-                return updatedPlayer;
-            });
-
-            setPlayers(updatedPlayers);
-        }
-
-        setEnemies(updatedEnemies);
-        setActionType("none");
+    const handleBuffClicked = (skill: any) => {
+        setActionType("buff");
         setDamage(undefined);
-        nextPlayerTurn();
+        setHealAmount(undefined);
+        setAoe(skill.aoe ?? false);
+
+        setSkillMeta({
+            name: skill.name,
+            cooldown: skill.cooldown ?? 0,
+            turns: skill.turns ?? 1,
+            attack: skill.attack ?? 0,
+            defense: skill.defense ?? 0,
+            target: skill.target ?? "self",
+        });
     };
 
     const handlePlayerHeal = (index: number) => {
         let updatedPlayers = [...players];
 
         if (skillMeta) {
-            setCooldowns(prev => [...prev, { [skillMeta.name]: skillMeta.cooldown }]);
+            setCooldowns(prev => {
+                const newMap = new Map(prev);
+                newMap.set(skillMeta.name, skillMeta.cooldown);
+                return newMap;
+            });
         }
 
         if (aoe) {
@@ -205,7 +213,81 @@ const rooms = () => {
         setPlayers(updatedPlayers);
         setActionType("none");
         setHealAmount(undefined);
-        nextPlayerTurn();
+        nextPlayerTurn(enemies);
+    };
+
+    const handleEnemyTargetedSkill = (index: number) => {
+        let updatedEnemies = [...enemies];
+        let totalGold = 0;
+        let totalExp = 0;
+
+        const hasEffect = skillMeta && skillMeta.effectType && skillMeta.turns !== undefined;
+
+        if (skillMeta) {
+            setCooldowns(prev => {
+                const newMap = new Map(prev);
+                newMap.set(skillMeta.name, skillMeta.cooldown);
+                return newMap;
+            });
+        }
+
+        const applyToEnemy = (enemy: Enemy): Enemy => {
+            if (!enemy.isAlive) return enemy;
+
+            let updated = enemy;
+
+            if (typeof damage === "number") {
+                const ignoresDefense = skillMeta?.ignoresDefense === true;
+                const finalDamage = ignoresDefense
+                    ? damage
+                    : Math.max(damage - enemy.defense, 0);
+                updated = updated.takeDamage(finalDamage);
+            }
+
+            if (hasEffect && updated.isAlive) {
+                updated = updated.addEffect({
+                    name: skillMeta.effectType,
+                    duration: skillMeta.turns,
+                });
+            }
+
+            if (!updated.isAlive) {
+                const { gold, exp } = enemy.die();
+                totalGold += gold;
+                totalExp += exp;
+            }
+
+            return updated;
+        };
+
+        if (aoe) {
+            updatedEnemies = updatedEnemies.map(applyToEnemy);
+        } else {
+            if (updatedEnemies[index].isAlive) {
+                updatedEnemies[index] = applyToEnemy(updatedEnemies[index]);
+            }
+        }
+
+        aliveEnemies.current = updatedEnemies.filter(e => e.isAlive);
+
+        if (totalGold > 0 || totalExp > 0) {
+            const updatedPlayers = players.map(player => {
+                let updated = player;
+                updated.gold += totalGold;
+                updated.exp += totalExp;
+                if (updated.exp >= updated.nextLevelExp) {
+                    updated = updated.levelUp();
+                }
+                return updated;
+            });
+
+            setPlayers(updatedPlayers);
+        }
+
+        setEnemies(updatedEnemies);
+        setActionType("none");
+        setDamage(undefined);
+        nextPlayerTurn(updatedEnemies);
     };
 
     useEffect(() => {
@@ -225,7 +307,7 @@ const rooms = () => {
                             enemyIndex={index}
                             enemy={enemy}
                             actionType={actionType}
-                            handleEnemyAttack={handleEnemyAttack}
+                            handleEnemyTargetedSkill={handleEnemyTargetedSkill}
                             aoe={aoe}
                         />
                     ))}
@@ -237,15 +319,14 @@ const rooms = () => {
                             key={index}
                             playerIndex={index}
                             player={player}
-                            enemies={enemies}
-                            addPlayer={addPlayer}
                             currentPlayer={currentPlayer?.name === player.name}
                             handleAttackClicked={handleAttackClicked}
                             cooldowns={cooldowns}
-                            setCooldowns={setCooldowns}
                             actionType={actionType}
                             handleHealClicked={handleHealClicked}
                             handlePlayerHeal={handlePlayerHeal}
+                            handleBuffClicked={handleBuffClicked}
+                            handleEffectClicked={handleEffectClicked}
                             aoe={aoe}
                         />
                     ))}

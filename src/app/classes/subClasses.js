@@ -39,8 +39,8 @@ export class Warrior extends Player {
             },
             {
                 name: 'Bulwark',
-                type: 'effect',
-                target: 'self',
+                type: 'buff',
+                defense: 5,
                 turns: 3,
                 cooldown: 0,
             }
@@ -72,10 +72,10 @@ export class Healer extends Player {
                 cooldown: 3,
             },
             {
-                name: 'Purify',
-                type: 'effect',
+                name: 'reserect',
+                type: 'buff',
                 target: 'ally',
-                cooldown: 3,
+                cooldown: 6,
             }
         ];
     }
@@ -100,17 +100,17 @@ export class Mage extends Player {
             },
             {
                 name: 'Stun Bolt',
-                type: 'attack',
+                effectType: 'stun',
+                type: 'effect',
                 damage: 8,
-                chance: 80,
                 aoe: false,
-                cooldown: 1,
-                turns: 1,
+                cooldown: 6,
+                turns: 3,
             },
             {
                 name: 'Arcane Empowerment',
-                type: 'effect',
-                target: 'self',
+                type: 'buff',
+                attack: 5,
                 cooldown: 3,
                 turns: 3,
             }
@@ -130,11 +130,11 @@ export class Rogue extends Player {
         this.skills = [
             {
                 name: 'Poison Dagger',
-                type: 'attack',
+                type: 'effect',
                 damage: 6,
-                chance: 100,
+                effectType: 'poison',
                 aoe: false,
-                cooldown: 1,
+                cooldown: 4,
                 turns: 3,
             },
             {
@@ -143,13 +143,15 @@ export class Rogue extends Player {
                 damage: 18,
                 aoe: false,
                 cooldown: 3,
+                ignoresDefense: true,
             },
             {
                 name: 'Expose Weakness',
                 type: 'effect',
+                effectType: 'defenseDebuff',
                 target: 'enemy',
-                cooldown: 2,
-                turns: 2,
+                cooldown: 3,
+                turns: 3,
             }
         ];
     }

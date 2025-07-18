@@ -5,16 +5,31 @@ export class Player {
         this.baseHealth = baseHealth;
         this.baseAttack = baseAttack;
         this.baseDefense = baseDefense;
-        this.bonusAttack = bonusAttack;
-        this.bonusDefense = bonusDefense;
         this.gold = gold;
         this.exp = exp;
         this.nextLevelExp = 50;
         this.currentHealth = currentHealth !== null ? currentHealth : this.maxHealth;
+        this.buffs = new Map();
     }
 
     get maxHealth() {
         return this.baseHealth + (this.level - 1) * this.healthPerLevel();
+    }
+
+    get bonusAttack() {
+        let total = 0;
+        for (const buff of this.buffs.values()) {
+            total += buff.attack || 0;
+        }
+        return total;
+    }
+
+    get bonusDefense() {
+        let total = 0;
+        for (const buff of this.buffs.values()) {
+            total += buff.defense || 0;
+        }
+        return total;
     }
 
     get attack() {
@@ -52,14 +67,31 @@ export class Player {
         return clone;
     }
 
-    addBuff({ attack = 0, defense = 0 }) {
-        this.bonusAttack += attack;
-        this.bonusDefense += defense;
+    addBuff(name, { duration, attack = 0, defense = 0 }) {
+        const clone = this.clone();
+        clone.buffs.set(name, { duration, attack, defense });
+        return clone;
+    }
+
+    tickBuffs() {
+        const clone = this.clone();
+        const newBuffs = new Map();
+
+        for (const [name, buff] of this.buffs.entries()) {
+            const newDuration = buff.duration - 1;
+            if (newDuration > 0) {
+                newBuffs.set(name, { ...buff, duration: newDuration });
+            }
+        }
+
+        clone.buffs = newBuffs;
+        return clone;
     }
 
     clearBuffs() {
-        this.bonusAttack = 0;
-        this.bonusDefense = 0;
+        const clone = this.clone();
+        clone.buffs = new Map();
+        return clone;
     }
 
     levelUp() {

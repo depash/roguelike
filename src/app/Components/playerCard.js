@@ -3,7 +3,19 @@ import { SkillsModal } from "./skillsModal";
 import styles from "./playerCard.module.css";
 import shared from "./shared.module.css";
 
-export const PlayerCard = ({ player, playerIndex, enemies, addPlayer, currentPlayer, handleAttackClicked, cooldowns, setCooldowns, actionType, handleHealClicked, handlePlayerHeal, aoe }) => {
+export const PlayerCard = ({
+    player,
+    playerIndex,
+    currentPlayer,
+    handleAttackClicked,
+    cooldowns,
+    actionType,
+    handleHealClicked,
+    handlePlayerHeal,
+    handleBuffClicked,
+    handleEffectClicked,
+    aoe
+}) => {
     const [showSkills, setShowSkills] = useState(false);
 
     const openSkills = () => {
@@ -22,13 +34,16 @@ export const PlayerCard = ({ player, playerIndex, enemies, addPlayer, currentPla
 
     return (
         <div
-            className={`
-        ${styles.individualPlayerContainer} 
-        ${currentPlayer && styles.currentPlayerContainer} 
-        ${actionType === "heal" && player.isAlive && !aoe ? styles.healingSelectable : null}
-        ${actionType === "heal" && player.isAlive && aoe ? styles.healingSelectableAoe : null}
-        `}
-            onClick={() => { actionType === "heal" && player.isAlive ? handlePlayerHeal(playerIndex) : null }}
+            className={[
+                styles.individualPlayerContainer,
+                currentPlayer && styles.currentPlayerContainer,
+                player.isAlive && (actionType === "heal" || actionType === "buff") && (aoe ? styles.healingSelectableAoe : styles.healingSelectable)
+            ].filter(Boolean).join(" ")}
+            onClick={() => {
+                if (actionType === "heal" && player.isAlive) {
+                    handlePlayerHeal(playerIndex);
+                }
+            }}
         >
             <div className={styles.playerInfo}>
                 <h2>{player.name}</h2>
@@ -88,10 +103,11 @@ export const PlayerCard = ({ player, playerIndex, enemies, addPlayer, currentPla
                     <SkillsModal
                         player={player}
                         closeSkills={closeSkills}
-                        handleAttackClicked={handleAttackClicked}
                         cooldowns={cooldowns}
-                        setCooldowns={setCooldowns}
+                        handleAttackClicked={handleAttackClicked}
                         handleHealClicked={handleHealClicked}
+                        handleBuffClicked={handleBuffClicked}
+                        handleEffectClicked={handleEffectClicked}
                     /> : null}
             </div>
         </div>

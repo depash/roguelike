@@ -11,6 +11,7 @@ export class Enemy {
         this.baseMaxExp = maxExp;
         this.currentHealth = currentHealth !== null ? currentHealth : this.maxHealth;
         this.diffucilty = diffucilty;
+        this.effects = new Map();
     }
 
     get name() {
@@ -29,7 +30,13 @@ export class Enemy {
 
     // +1 defense per level
     get defense() {
-        return this.baseDefense + (this.level - 1) * 1;
+        let defence = this.baseDefense + (this.level - 1) * 1;
+
+        if (this.hasEffect("defenseDebuff")) {
+            defence = Math.floor(defence * 0.6);
+        }
+
+        return defence;
     }
 
     // +2 minimum gold per level
@@ -64,9 +71,49 @@ export class Enemy {
     takeDamage(damage) {
         const clone = this.clone();
         clone.currentHealth -= damage;
+        console.log(clone)
         return clone;
     }
 
+    addEffect(effect) {
+        const clone = this.clone();
+        clone.effects = new Map(this.effects);
+        clone.effects.set(effect.name, effect.duration);
+        return clone;
+    }
+
+    tickEffects() {
+        const clone = this.clone();
+        const newEffects = new Map();
+
+        for (const [name, duration] of this.effects.entries()) {
+            const newDuration = duration - 1;
+            if (newDuration > 0) {
+                newEffects.set(name, newDuration);
+            }
+        }
+
+        clone.effects = newEffects;
+        return clone;
+    }
+
+    applyEffects() {
+        const clone = this.clone();
+
+        for (const [name] of this.effects.entries()) {
+            if (name === "poison") {
+                const poisonDamage = Math.floor(clone.currentHealth * 0.05);
+                clone.currentHealth -= poisonDamage;
+            }
+        }
+
+        return clone;
+    }
+
+
+    hasEffect(effectName) {
+        return this.effects.has(effectName);
+    }
 
     die() {
         const goldDropped = Math.floor(Math.random() * (this.maxGold - this.minGold + 1)) + this.minGold;
