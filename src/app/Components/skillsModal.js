@@ -8,7 +8,8 @@ export const SkillsModal = ({ player, closeSkills, handleAttackClicked, cooldown
                 <h2 className={styles.skillsHeader}>Skills</h2>
                 <ul className={styles.skillsList}>
                     {player.skills.map((skill, index) => (
-                        <li key={index} className={styles.skillItem} onClick={() => {
+                        <li key={index} className={styles.skillItem} onClick={(e) => {
+                            e.stopPropagation();
                             if (skill.type === 'attack') {
                                 let isOnCooldown = cooldowns.findIndex(cooldowns => cooldowns[skill.name]);
                                 if (isOnCooldown === -1) {

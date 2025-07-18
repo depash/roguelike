@@ -34,6 +34,7 @@ const rooms = () => {
     const [actionType, setActionType] = useState<ActionType>("none");
     const [damage, setDamage] = useState<number | undefined>();
     const [healAmount, setHealAmount] = useState<number | undefined>();
+    const [skillMeta, setSkillMeta] = useState<{ name: string; cooldown: number } | null>(null);
     const [aoe, setAoe] = useState<boolean>(false);
 
 
@@ -107,10 +108,11 @@ const rooms = () => {
         setHealAmount(undefined);
 
         if (skill) {
-            setCooldowns(prev => [...prev, { [skill.name]: skill.cooldown }]);
+            setSkillMeta({ name: skill.name, cooldown: skill.cooldown });
+        } else {
+            setSkillMeta(null);
         }
     };
-
 
     const handleHealClicked = (skill: any) => {
         setActionType("heal");
@@ -118,14 +120,17 @@ const rooms = () => {
         setAoe(skill.aoe);
         setDamage(undefined);
 
-        setCooldowns(prev => [...prev, { [skill.name]: skill.cooldown }]);
+        setSkillMeta({ name: skill.name, cooldown: skill.cooldown });
     };
-
 
     const handleEnemyAttack = (index: number) => {
         let updatedEnemies = [...enemies];
         let totalGold = 0;
         let totalExp = 0;
+
+        if (skillMeta) {
+            setCooldowns(prev => [...prev, { [skillMeta.name]: skillMeta.cooldown }]);
+        }
 
         if (aoe) {
             updatedEnemies = updatedEnemies.map((enemy) => {
@@ -181,6 +186,10 @@ const rooms = () => {
 
     const handlePlayerHeal = (index: number) => {
         let updatedPlayers = [...players];
+
+        if (skillMeta) {
+            setCooldowns(prev => [...prev, { [skillMeta.name]: skillMeta.cooldown }]);
+        }
 
         if (aoe) {
             updatedPlayers = updatedPlayers.map(player => {
