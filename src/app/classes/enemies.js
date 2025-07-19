@@ -63,7 +63,6 @@ export class Enemy {
         return this.currentHealth > 0;
     }
 
-
     clone() {
         return Object.create(Object.getPrototypeOf(this), Object.getOwnPropertyDescriptors(this));
     }
@@ -110,7 +109,6 @@ export class Enemy {
         return clone;
     }
 
-
     hasEffect(effectName) {
         return this.effects.has(effectName);
     }
@@ -124,7 +122,7 @@ export class Enemy {
 
 class Goblin extends Enemy {
     constructor(level) {
-        super("Goblin", level, 50, 3, 1, 5, 15, 10, 20, 1);
+        super("Goblin", level, 50, 3, 1, 5, 15, 10, 20);
         // (name, level, baseHealth, baseAttack, baseDefense, minGold, maxGold, minExp, maxExp)
     }
 }

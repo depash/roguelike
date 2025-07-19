@@ -1,6 +1,6 @@
 import styles from "./skillsModal.module.css";
 
-export const SkillsModal = ({ player, closeSkills, cooldowns, handleAttackClicked, handleHealClicked, handleBuffClicked, handleEffectClicked }) => {
+export const SkillsModal = ({ player, closeSkills, cooldowns, handleAttackClicked, handleHealClicked, handleBuffClicked, handleEffectClicked, playerIndex }) => {
     return (
         <>
             <div className={styles.modalBackdrop} onClick={closeSkills}></div>
@@ -41,7 +41,7 @@ export const SkillsModal = ({ player, closeSkills, cooldowns, handleAttackClicke
                             } else if (skill.type === 'buff') {
                                 const turnsLeft = cooldowns.get(skill.name);
                                 if (turnsLeft === undefined) {
-                                    handleBuffClicked(skill);
+                                    handleBuffClicked(skill, playerIndex);
                                     closeSkills();
                                 } else {
                                     alert(`Skill ${skill.name} is on cooldown for ${turnsLeft} turns!`);

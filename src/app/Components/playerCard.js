@@ -14,7 +14,8 @@ export const PlayerCard = ({
     handlePlayerHeal,
     handleBuffClicked,
     handleEffectClicked,
-    aoe
+    aoe,
+    skillMeta
 }) => {
     const [showSkills, setShowSkills] = useState(false);
 
@@ -32,15 +33,43 @@ export const PlayerCard = ({
     if (healthPercent <= 0.5) healthColor = "#ffcc00";
     if (healthPercent <= 0.25) healthColor = "#e63946";
 
+    const isResurrect = skillMeta?.name?.toLowerCase() === "resurrect";
+    const isSelectableForRes = isResurrect && !player.isAlive && actionType === "heal";
+    const isSelectableNormal =
+        !isResurrect && player.isAlive && (actionType === "heal" || actionType === "buff");
+
+    const shouldDimBecauseUnselectable =
+        isResurrect && player.isAlive && actionType === "heal";
+
+    const selectableClass =
+        (isSelectableForRes || isSelectableNormal)
+            ? aoe
+                ? styles.healingSelectableAoe
+                : styles.healingSelectable
+            : "";
+
+    const isVisuallyDead =
+        !player.isAlive && (!isResurrect || actionType !== "heal");
+
+    const playerClasses = [
+        styles.individualPlayerContainer,
+        isVisuallyDead && styles.playerDead,
+        shouldDimBecauseUnselectable && styles.dimUnselectable,
+        currentPlayer && styles.currentPlayerContainer,
+        selectableClass
+    ].filter(Boolean).join(" ");
+
     return (
         <div
-            className={[
-                styles.individualPlayerContainer,
-                currentPlayer && styles.currentPlayerContainer,
-                player.isAlive && (actionType === "heal" || actionType === "buff") && (aoe ? styles.healingSelectableAoe : styles.healingSelectable)
-            ].filter(Boolean).join(" ")}
+            className={playerClasses}
             onClick={() => {
-                if (actionType === "heal" && player.isAlive) {
+                if (
+                    actionType === "heal" &&
+                    (
+                        (isResurrect && !player.isAlive) ||
+                        (!isResurrect && player.isAlive)
+                    )
+                ) {
                     handlePlayerHeal(playerIndex);
                 }
             }}
@@ -108,6 +137,7 @@ export const PlayerCard = ({
                         handleHealClicked={handleHealClicked}
                         handleBuffClicked={handleBuffClicked}
                         handleEffectClicked={handleEffectClicked}
+                        playerIndex={playerIndex}
                     /> : null}
             </div>
         </div>

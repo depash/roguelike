@@ -62,7 +62,7 @@ const rooms = () => {
         setCurrentPlayer(initiativeOrder.current[0]);
     };
 
-    const nextPlayerTurn = (enemies: Enemy[]) => {
+    const nextPlayerTurn = (enemies: Enemy[], players: Player[]) => {
         initiativeOrder.current = initiativeOrder.current.filter(p => p !== currentPlayer);
 
         const enemiesWithEffectsApplied = enemies.map(e => {
@@ -77,26 +77,28 @@ const rooms = () => {
         } else {
             const damagedPlayers = [...players];
 
-            const warriorIndex = players.findIndex(p => p.name === "Warrior" && p.currentHealth > 0);
-            const warriorExists = warriorIndex !== -1;
+            const alivePlayers = players.filter(p => p.isAlive);
+            const warrior = alivePlayers.find(p => p.name === "Warrior");
 
             for (const enemy of enemiesWithEffectsApplied) {
                 if (enemy.hasEffect("stun")) continue;
 
-                let targetIndex;
+                let target: Player | undefined;
 
-                if (enemy.hasEffect("taunt") && warriorExists) {
-                    targetIndex = warriorIndex;
+                if (enemy.hasEffect("taunt") && warrior) {
+                    target = warrior;
                 } else {
-                    targetIndex = Math.floor(Math.random() * players.length);
+                    const randomIndex = Math.floor(Math.random() * alivePlayers.length);
+                    target = alivePlayers[randomIndex];
                 }
 
-                if (targetIndex !== -1) {
-                    damagedPlayers[targetIndex] = damagedPlayers[targetIndex].takeDamage(enemy.attack - damagedPlayers[targetIndex].defense);
+                if (target) {
+                    const targetIndex = players.findIndex(p => p.name === target!.name);
+                    damagedPlayers[targetIndex] = damagedPlayers[targetIndex].takeDamage(
+                        enemy.attack - damagedPlayers[targetIndex].defense
+                    );
                 }
             }
-
-            setPlayers(damagedPlayers);
 
             setCooldowns(prev => {
                 const newMap = new Map<string, number>();
@@ -111,6 +113,8 @@ const rooms = () => {
 
             const updatedEnemies = enemiesWithEffectsApplied.map(e => e.tickEffects());
             aliveEnemies.current = updatedEnemies.filter(e => e.isAlive);
+            const updatedPlayers = damagedPlayers.map(player => player.tickBuffs());
+            setPlayers(updatedPlayers);
             setEnemies(updatedEnemies);
 
             generateInitiativeOrder();
@@ -122,6 +126,8 @@ const rooms = () => {
                 setFloorNum(prev => prev + 1);
                 setRoomNum(1);
             }
+
+            setPlayers(players.map(p => p.clearBuffs()));
 
             const newEnemies = [
                 generateEnemyBasedOnPlayerLevel(players[0].level),
@@ -172,24 +178,33 @@ const rooms = () => {
         });
     };
 
-    const handleBuffClicked = (skill: any) => {
-        setActionType("buff");
-        setDamage(undefined);
-        setHealAmount(undefined);
-        setAoe(skill.aoe ?? false);
+    const handleBuffClicked = (skill: any, playerIndex: number) => {
+        const updatedPlayers = [...players];
+        const skillBuff = {
+            duration: skill.turns ?? 1,
+            attack: skill.attackPercent ?? 0,
+            defense: skill.defensePercent ?? 0,
+        };
 
-        setSkillMeta({
-            name: skill.name,
-            cooldown: skill.cooldown ?? 0,
-            turns: skill.turns ?? 1,
-            attack: skill.attack ?? 0,
-            defense: skill.defense ?? 0,
-            target: skill.target ?? "self",
-        });
+        updatedPlayers[playerIndex] = updatedPlayers[playerIndex].addBuff(skill.name, skillBuff);
+
+        if (skill.cooldown !== undefined) {
+            setCooldowns(prev => {
+                const newMap = new Map(prev);
+                newMap.set(skill.name, skill.cooldown);
+                return newMap;
+            });
+        }
+
+        setPlayers(updatedPlayers);
+        setActionType("none");
+        nextPlayerTurn(enemies, updatedPlayers);
     };
 
     const handlePlayerHeal = (index: number) => {
         let updatedPlayers = [...players];
+
+        const isResurrect = skillMeta?.name?.toLowerCase() === "resurrect";
 
         if (skillMeta) {
             setCooldowns(prev => {
@@ -200,24 +215,30 @@ const rooms = () => {
         }
 
         if (aoe) {
-            updatedPlayers = updatedPlayers.map(player => {
-                return player.isAlive ? player.heal(healAmount) : player;
-            });
+            updatedPlayers = updatedPlayers.map(player =>
+                player.isAlive ? player.heal(healAmount) : player
+            );
         } else {
-            const playerToHeal = players[index];
-            if (playerToHeal.isAlive) {
-                updatedPlayers[index] = playerToHeal.heal(healAmount);
+            const targetPlayer = players[index];
+
+            if (isResurrect && !targetPlayer.isAlive) {
+                const healAmount = Math.ceil(targetPlayer.maxHealth * 0.25);
+                updatedPlayers[index].currentHealth = healAmount;
+            } else if (targetPlayer.isAlive) {
+                updatedPlayers[index] = targetPlayer.heal(healAmount);
             }
         }
 
         setPlayers(updatedPlayers);
         setActionType("none");
         setHealAmount(undefined);
-        nextPlayerTurn(enemies);
+        nextPlayerTurn(enemies, updatedPlayers);
     };
+
 
     const handleEnemyTargetedSkill = (index: number) => {
         let updatedEnemies = [...enemies];
+        let updatedPlayers = [...players];
         let totalGold = 0;
         let totalExp = 0;
 
@@ -287,7 +308,7 @@ const rooms = () => {
         setEnemies(updatedEnemies);
         setActionType("none");
         setDamage(undefined);
-        nextPlayerTurn(updatedEnemies);
+        nextPlayerTurn(updatedEnemies, updatedPlayers);
     };
 
     useEffect(() => {
@@ -328,6 +349,7 @@ const rooms = () => {
                             handleBuffClicked={handleBuffClicked}
                             handleEffectClicked={handleEffectClicked}
                             aoe={aoe}
+                            skillMeta={skillMeta}
                         />
                     ))}
                 </div>

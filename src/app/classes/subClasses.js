@@ -38,11 +38,11 @@ export class Warrior extends Player {
                 cooldown: 2,
             },
             {
-                name: 'Bulwark',
-                type: 'buff',
-                defense: 5,
+                name: "Bulwark",
+                type: "buff",
+                defensePercent: 0.4,
                 turns: 3,
-                cooldown: 0,
+                cooldown: 2
             }
         ];
     }
@@ -72,8 +72,8 @@ export class Healer extends Player {
                 cooldown: 3,
             },
             {
-                name: 'reserect',
-                type: 'buff',
+                name: 'resurrect',
+                type: 'heal',
                 target: 'ally',
                 cooldown: 6,
             }
@@ -110,7 +110,7 @@ export class Mage extends Player {
             {
                 name: 'Arcane Empowerment',
                 type: 'buff',
-                attack: 5,
+                attackPercent: 0.2,
                 cooldown: 3,
                 turns: 3,
             }

@@ -18,6 +18,14 @@
     position: relative;
 }
 
+.playerDead {
+    opacity: 0.5;
+}
+
+.dimUnselectable {
+    opacity: 0.5;
+}
+
 .currentPlayerContainer::before {
     content: "";
     position: absolute;

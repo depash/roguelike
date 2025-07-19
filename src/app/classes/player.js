@@ -19,7 +19,7 @@ export class Player {
     get bonusAttack() {
         let total = 0;
         for (const buff of this.buffs.values()) {
-            total += buff.attack || 0;
+            total += Math.floor(this.baseAttack * (buff.attack || 0));
         }
         return total;
     }
@@ -27,7 +27,7 @@ export class Player {
     get bonusDefense() {
         let total = 0;
         for (const buff of this.buffs.values()) {
-            total += buff.defense || 0;
+            total += Math.floor(this.baseDefense * (buff.defense || 0));
         }
         return total;
     }
