@@ -59,6 +59,11 @@ export const PlayerCard = ({
         selectableClass
     ].filter(Boolean).join(" ");
 
+    const buffIcons = {
+        bulwark: <span style={{ color: "#4CAF50" }}>🛡️</span>,
+        "arcane empowerment": <span>✨</span>,
+    };
+
     return (
         <div
             className={playerClasses}
@@ -77,6 +82,20 @@ export const PlayerCard = ({
             <div className={styles.playerInfo}>
                 <h2>{player.name}</h2>
                 <p>Level: {player.level}</p>
+                <div className={styles.buffsContainer}>
+                    {[...player.buffs.entries()].map(([buffName, buffData]) => (
+                        <div
+                            key={buffName}
+                            className={styles.buffIconWrapper}
+                            title={`${buffName.charAt(0).toUpperCase() + buffName.slice(1)} (${buffData.duration} turns)`}
+                        >
+                            <span className={styles.buffIcon}>
+                                {buffIcons[buffName.toLowerCase()]}
+                            </span>
+                            <span className={styles.buffDuration}>{buffData.duration}</span>
+                        </div>
+                    ))}
+                </div>
                 <div className={shared.healthBarContainer}>
                     <span className={shared.healthBarLabel}>HP</span>
                     <div className={shared.healthBarWrapper}>
@@ -92,8 +111,20 @@ export const PlayerCard = ({
                         {player.currentHealth} / {player.maxHealth}
                     </span>
                 </div>
-                <p>Attack: {player.attack}</p>
-                <p>Defense: {player.defense}</p>
+                <p>
+                    Attack:{" "}
+                    <span style={{ color: player.buffs.has("Arcane Empowerment") ? "#4CAF50" : "inherit" }}>
+                        {player.attack}
+                        {player.buffs.has("Arcane Empowerment") && " ↑"}
+                    </span>
+                </p>
+                <p>
+                    Defense:{" "}
+                    <span style={{ color: player.buffs.has("Bulwark") ? "#4CAF50" : "inherit" }}>
+                        {player.defense}
+                        {player.buffs.has("Bulwark") && " ↑"}
+                    </span>
+                </p>
                 <div className={styles.xpBarContainer}>
                     <span className={styles.xpBarLabel}>XP</span>
                     <div className={styles.xpBarWrapper}>

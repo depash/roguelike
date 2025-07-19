@@ -2,7 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import styles from "./page.module.css";
 import { Player } from '../classes/player.js'
-import { Enemy, generateEnemyBasedOnPlayerLevel } from '../classes/enemies.js'
+import { Enemy, generateEnemyGroup } from '../classes/enemies.js'
 import { EnemyCard } from '../components/EnemyCard.js';
 import { PlayerCard } from '../components/PlayerCard.js';
 import { Warrior, Healer, Mage, Rogue } from '../classes/subClasses.js';
@@ -17,7 +17,6 @@ import { Warrior, Healer, Mage, Rogue } from '../classes/subClasses.js';
 // floors that be what determines allies being added or rest spot
 const rooms = () => {
     const classes = [Warrior, Healer, Mage, Rogue];
-    const availableClasses = useRef([...classes]);
     const initiativeOrder = useRef<(Player)[]>([]);
     type ActionType = "attack" | "heal" | "effect" | "buff" | "none";
 
@@ -25,7 +24,7 @@ const rooms = () => {
         return classes.map(PlayerClass => new PlayerClass());
     });
 
-    const [enemies, setEnemies] = useState([generateEnemyBasedOnPlayerLevel(1), generateEnemyBasedOnPlayerLevel(1), generateEnemyBasedOnPlayerLevel(1), generateEnemyBasedOnPlayerLevel(1)]);
+    const [enemies, setEnemies] = useState(generateEnemyGroup(players[0].level, 1));
     const [roomNum, setRoomNum] = useState(1);
     const [floorNum, setFloorNum] = useState(1);
     const [currentPlayer, setCurrentPlayer] = useState<Player | undefined>(undefined);
@@ -46,19 +45,16 @@ const rooms = () => {
     const [aoe, setAoe] = useState<boolean>(false);
     const aliveEnemies = useRef<Enemy[]>([...enemies]);
 
-    const addPlayer = () => {
-        const classes = availableClasses.current;
-        if (classes.length === 0) return;
-        let selectedClass = Math.floor(Math.random() * classes.length);
-        let newClass = new classes[selectedClass]();
-        classes.splice(selectedClass, 1);
-        availableClasses.current = classes;
-        setPlayers(prevPlayers => [...prevPlayers, newClass]);
-    };
-
-    const generateInitiativeOrder = () => {
+    const generateInitiativeOrder = (players: Player[]) => {
         const allCharacters = [...players];
-        initiativeOrder.current = allCharacters;
+        initiativeOrder.current = allCharacters.filter(p => p.isAlive);
+
+        if (!initiativeOrder.current.length) {
+            alert("All players are dead! Game Over!");
+            window.location.href = "/";
+            return;
+        }
+
         setCurrentPlayer(initiativeOrder.current[0]);
     };
 
@@ -67,17 +63,18 @@ const rooms = () => {
 
         const enemiesWithEffectsApplied = enemies.map(e => {
             if (e.isAlive) {
-                e.applyEffects();
+                return e.applyEffects();
             }
             return e;
         });
+
+        const alivePlayers = players.filter(p => p.isAlive);
 
         if (initiativeOrder.current.length) {
             setCurrentPlayer(initiativeOrder.current[0]);
         } else {
             const damagedPlayers = [...players];
 
-            const alivePlayers = players.filter(p => p.isAlive);
             const warrior = alivePlayers.find(p => p.name === "Warrior");
 
             for (const enemy of enemiesWithEffectsApplied) {
@@ -117,25 +114,32 @@ const rooms = () => {
             setPlayers(updatedPlayers);
             setEnemies(updatedEnemies);
 
-            generateInitiativeOrder();
+            generateInitiativeOrder(updatedPlayers);
         }
 
         if (!aliveEnemies.current.length) {
-            setRoomNum(prevRoomNum => prevRoomNum + 1);
-            if (roomNum % (floorNum * 5) === 0) {
-                setFloorNum(prev => prev + 1);
-                setRoomNum(1);
+            const nextRoomNum = roomNum + 1;
+            let nextFloorNum = floorNum;
+
+            if (nextRoomNum % (floorNum * 5) === 0) {
+                nextFloorNum += 1;
             }
 
-            setPlayers(players.map(p => p.clearBuffs()));
+            const isFinalRoom = nextRoomNum % (floorNum * 5) === 0;
 
-            const newEnemies = [
-                generateEnemyBasedOnPlayerLevel(players[0].level),
-                generateEnemyBasedOnPlayerLevel(players[0].level),
-                generateEnemyBasedOnPlayerLevel(players[0].level),
-                generateEnemyBasedOnPlayerLevel(players[0].level)
-            ];
+            setRoomNum(prevRoomNum => {
+                if (isFinalRoom) return 1;
+                return prevRoomNum + 1;
+            });
 
+            if (isFinalRoom) {
+                setFloorNum(prev => prev + 1);
+            }
+
+            const difficulty = Math.min(25, floorNum * 2 + Math.floor(nextRoomNum / 2));
+            const newEnemies = generateEnemyGroup(players[0].level, difficulty, isFinalRoom, floorNum);
+
+            generateInitiativeOrder(players);
             setEnemies(newEnemies);
             aliveEnemies.current = newEnemies;
         }
@@ -312,7 +316,7 @@ const rooms = () => {
     };
 
     useEffect(() => {
-        generateInitiativeOrder();
+        generateInitiativeOrder(players);
     }, []);
 
     return (

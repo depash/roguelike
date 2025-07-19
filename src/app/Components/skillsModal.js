@@ -7,50 +7,31 @@ export const SkillsModal = ({ player, closeSkills, cooldowns, handleAttackClicke
             <div className={styles.skillsModalInline}>
                 <h2 className={styles.skillsHeader}>Skills</h2>
                 <ul className={styles.skillsList}>
-                    {player.skills.map((skill, index) => (
-                        <li key={index} className={styles.skillItem} onClick={(e) => {
-                            e.stopPropagation();
-                            if (skill.type === 'attack') {
-                                const turnsLeft = cooldowns.get(skill.name);
-                                if (turnsLeft === undefined) {
-                                    handleAttackClicked(skill.damage, skill.aoe, skill);
+                    {player.skills.map((skill, index) => {
+                        const turnsLeft = cooldowns.get(skill.name);
+                        const onCooldown = turnsLeft !== undefined;
+                        return (
+                            <li
+                                key={index}
+                                className={`${styles.skillItem} ${onCooldown ? styles.skillOnCooldown : ""}`}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (onCooldown) {
+                                        return;
+                                    }
+                                    if (skill.type === 'attack') handleAttackClicked(skill.damage, skill.aoe, skill);
+                                    else if (skill.type === 'heal') handleHealClicked(skill);
+                                    else if (skill.type === 'effect') handleEffectClicked(skill);
+                                    else if (skill.type === 'buff') handleBuffClicked(skill, playerIndex);
+
                                     closeSkills();
-                                }
-                                else {
-                                    alert(`Skill ${skill.name} is on cooldown for ${turnsLeft} turns!`);
-                                }
-                            }
-                            else if (skill.type === 'heal') {
-                                const turnsLeft = cooldowns.get(skill.name);
-                                if (turnsLeft === undefined) {
-                                    handleHealClicked(skill);
-                                    closeSkills();
-                                }
-                                else {
-                                    alert(`Skill ${skill.name} is on cooldown for ${turnsLeft} turns!`);
-                                }
-                            }
-                            else if (skill.type === 'effect') {
-                                const turnsLeft = cooldowns.get(skill.name);
-                                if (turnsLeft === undefined) {
-                                    handleEffectClicked(skill);
-                                    closeSkills();
-                                } else {
-                                    alert(`Skill ${skill.name} is on cooldown for ${turnsLeft} turns!`);
-                                }
-                            } else if (skill.type === 'buff') {
-                                const turnsLeft = cooldowns.get(skill.name);
-                                if (turnsLeft === undefined) {
-                                    handleBuffClicked(skill, playerIndex);
-                                    closeSkills();
-                                } else {
-                                    alert(`Skill ${skill.name} is on cooldown for ${turnsLeft} turns!`);
-                                }
-                            }
-                        }}>
-                            {skill.name}
-                        </li>
-                    ))}
+                                }}
+                            >
+                                {skill.name}
+                                {onCooldown && <span className={styles.cooldownTimer}> ({turnsLeft})</span>}
+                            </li>
+                        );
+                    })}
                 </ul>
             </div>
         </>

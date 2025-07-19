@@ -10,7 +10,6 @@ export class Enemy {
         this.baseMinExp = minExp;
         this.baseMaxExp = maxExp;
         this.currentHealth = currentHealth !== null ? currentHealth : this.maxHealth;
-        this.diffucilty = diffucilty;
         this.effects = new Map();
     }
 
@@ -70,7 +69,6 @@ export class Enemy {
     takeDamage(damage) {
         const clone = this.clone();
         clone.currentHealth -= damage;
-        console.log(clone)
         return clone;
     }
 
@@ -101,7 +99,7 @@ export class Enemy {
 
         for (const [name] of this.effects.entries()) {
             if (name === "poison") {
-                const poisonDamage = Math.floor(clone.currentHealth * 0.05);
+                const poisonDamage = Math.floor(clone.currentHealth * 0.1);
                 clone.currentHealth -= poisonDamage;
             }
         }
@@ -170,18 +168,100 @@ class Slimes extends Enemy {
     }
 }
 
-// final boss be dragon
+class Miniboss extends Enemy {
+    constructor(name, level, baseHealth, baseAttack, baseDefense) {
+        super(name, level, baseHealth, baseAttack, baseDefense, 50, 100, 50, 100);
+    }
+}
 
-// Array of all enemy classes
-const allEnemies = [Goblin, Orc, Troll, Skeleton, Bandit, Witch, Demon, Slimes];
+class Ogre extends Miniboss {
+    constructor(level) {
+        super("Ogre Brute", level, 200, 12, 8);
+    }
+}
 
-// Generate enemy of random type with level scaled based on player level
-export function generateEnemyBasedOnPlayerLevel(playerLevel) {
-    const enemyLevel = playerLevel;
+class DarkKnight extends Miniboss {
+    constructor(level) {
+        super("Dark Knight", level, 180, 14, 7);
+    }
+}
 
-    // generate number of enemies based on player level and difficulty
+class Warlock extends Miniboss {
+    constructor(level) {
+        super("Warlock", level, 180, 12, 4, 30, 55, 35, 65);
+    }
+}
 
-    const EnemyClass = allEnemies[Math.floor(Math.random() * allEnemies.length)];
+class GiantSpider extends Miniboss {
+    constructor(level) {
+        super("Giant Spider", level, 160, 10, 6, 28, 52, 32, 60);
+    }
+}
 
-    return new EnemyClass(enemyLevel);
+class BloodKnight extends Miniboss {
+    constructor(level) {
+        super("Blood Knight", level, 190, 11, 5, 32, 60, 38, 68);
+    }
+}
+
+class Dragon extends Enemy {
+    constructor(level) {
+        super("Dragon", level, 300, 20, 12, 100, 200, 150, 250);
+    }
+}
+
+const MAX_GROUP_SIZE = 4;
+
+export function generateEnemyGroup(playerLevel, roomDifficulty, isFinalRoom = false, floorNum = 1) {
+    const enemiesByDifficulty = {
+        1: [Goblin, Skeleton],
+        2: [Orc, Bandit],
+        3: [Troll, Witch],
+        4: [Demon, Slimes],
+    };
+
+    const minibosses = [Ogre, DarkKnight, Warlock, GiantSpider, BloodKnight];
+
+    const group = [];
+
+    const isFinalFloor = floorNum === 25;
+    const isFloorEnd = isFinalRoom;
+
+    let remainingDifficulty = isFinalRoom
+        ? isFinalFloor
+            ? 25
+            : Math.min(25, roomDifficulty + 3)
+        : roomDifficulty;
+
+    if (isFinalFloor && isFloorEnd) {
+        const boss = new Dragon(playerLevel + 2);
+        group.push(boss);
+        remainingDifficulty -= 6;
+    }
+    else if (isFloorEnd) {
+        const MinibossClass = minibosses[Math.floor(Math.random() * minibosses.length)];
+        const miniboss = new MinibossClass(playerLevel + 1);
+        group.push(miniboss);
+        remainingDifficulty -= 4;
+    }
+
+    while (remainingDifficulty > 0 && group.length < MAX_GROUP_SIZE) {
+        const possibleDifficulties = Object.keys(enemiesByDifficulty)
+            .map(Number)
+            .filter(d => d <= remainingDifficulty && (!isFinalRoom || d >= 2));
+
+        if (possibleDifficulties.length === 0) break;
+
+        const difficulty = possibleDifficulties[Math.floor(Math.random() * possibleDifficulties.length)];
+        const enemyOptions = enemiesByDifficulty[difficulty];
+        const EnemyClass = enemyOptions[Math.floor(Math.random() * enemyOptions.length)];
+
+        const enemyLevel = isFinalRoom ? playerLevel + 1 : playerLevel;
+        const enemy = new EnemyClass(enemyLevel);
+
+        group.push(enemy);
+        remainingDifficulty -= difficulty;
+    }
+
+    return group;
 }

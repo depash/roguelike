@@ -98,7 +98,6 @@ export class Player {
         const clone = this.clone();
         clone.exp = 0;
         clone.level++;
-        clone.currentHealth = clone.maxHealth;
         return clone;
     }
 }

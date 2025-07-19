@@ -42,7 +42,7 @@ export class Warrior extends Player {
                 type: "buff",
                 defensePercent: 0.4,
                 turns: 3,
-                cooldown: 2
+                cooldown: 3,
             }
         ];
     }
