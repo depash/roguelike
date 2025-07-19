@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { SkillsModal } from "./SkillsModal";
-import styles from "./PlayerCard.module.css";
-import shared from "./Shared.module.css";
+import { SkillsModal } from "./skillsModal";
+import styles from "./playerCard.module.css";
+import shared from "./shared.module.css";
 
 type Skill = {
     name: string;
