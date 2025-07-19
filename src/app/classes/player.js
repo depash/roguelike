@@ -13,13 +13,13 @@ export class Player {
     }
 
     get maxHealth() {
-        return this.baseHealth + (this.level - 1) * this.healthPerLevel();
+        return Math.ceil(this.baseHealth + (this.level - 1) * this.healthPerLevel());
     }
 
     get bonusAttack() {
         let total = 0;
         for (const buff of this.buffs.values()) {
-            total += Math.floor(this.baseAttack * (buff.attack || 0));
+            total += Math.ceil(this.baseAttack * (buff.attack || 0));
         }
         return total;
     }
@@ -27,17 +27,21 @@ export class Player {
     get bonusDefense() {
         let total = 0;
         for (const buff of this.buffs.values()) {
-            total += Math.floor(this.baseDefense * (buff.defense || 0));
+            total += Math.ceil(this.baseDefense * (buff.defense || 0));
         }
         return total;
     }
 
     get attack() {
-        return this.baseAttack + (this.level - 1) * this.attackPerLevel() + this.bonusAttack;
+        return Math.ceil(
+            this.baseAttack + (this.level - 1) * this.attackPerLevel() + this.bonusAttack
+        );
     }
 
     get defense() {
-        return this.baseDefense + (this.level - 1) * this.defensePerLevel() + this.bonusDefense;
+        return Math.ceil(
+            this.baseDefense + (this.level - 1) * this.defensePerLevel() + this.bonusDefense
+        );
     }
 
     get isAlive() {
@@ -60,7 +64,7 @@ export class Player {
 
     heal(heal) {
         const clone = this.clone();
-        clone.currentHealth += heal;
+        clone.currentHealth += Math.ceil(heal);
         if (clone.currentHealth > clone.maxHealth) {
             clone.currentHealth = clone.maxHealth;
         }
@@ -69,7 +73,11 @@ export class Player {
 
     addBuff(name, { duration, attack = 0, defense = 0 }) {
         const clone = this.clone();
-        clone.buffs.set(name, { duration, attack, defense });
+        clone.buffs.set(name, {
+            duration,
+            attack: Math.ceil(attack * 100) / 100,
+            defense: Math.ceil(defense * 100) / 100
+        });
         return clone;
     }
 

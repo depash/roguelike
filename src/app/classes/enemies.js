@@ -1,5 +1,5 @@
 export class Enemy {
-    constructor(name, level, baseHealth, baseAttack, baseDefense, minGold, maxGold, minExp, maxExp, currentHealth = null, diffucilty) {
+    constructor(name, level, baseHealth, baseAttack, baseDefense, minGold, maxGold, minExp, maxExp, currentHealth = null, difficulty) {
         this.baseName = name;
         this.level = level;
         this.baseHealth = baseHealth;
@@ -17,45 +17,36 @@ export class Enemy {
         return `${this.baseName} Lv.${this.level}`;
     }
 
-    // +10 HP per level
     get maxHealth() {
-        return this.baseHealth + (this.level - 1) * 10;
+        return Math.floor(this.baseHealth + (this.level - 1) * 12);
     }
 
-    // +2 attack per level
     get attack() {
-        return this.baseAttack + (this.level - 1) * 2;
+        return Math.floor(this.baseAttack + (this.level - 1) * 2.2);
     }
 
-    // +1 defense per level
     get defense() {
-        let defence = this.baseDefense + (this.level - 1) * 1;
-
+        let defense = Math.floor(this.baseDefense + (this.level - 1) * 1.1);
         if (this.hasEffect("defenseDebuff")) {
-            defence = Math.floor(defence * 0.6);
+            defense = Math.floor(defense * 0.6);
         }
-
-        return defence;
+        return defense;
     }
 
-    // +2 minimum gold per level
     get minGold() {
-        return this.baseMinGold + (this.level - 1) * 2;
+        return Math.floor(this.baseMinGold + (this.level - 1) * 2.5);
     }
 
-    // +5 maximum gold per level
     get maxGold() {
-        return this.baseMaxGold + (this.level - 1) * 5;
+        return Math.floor(this.baseMaxGold + (this.level - 1) * 5.5);
     }
 
-    // +3 minimum EXP per level
     get minExp() {
-        return this.baseMinExp + (this.level - 1) * 3;
+        return Math.floor(this.baseMinExp + (this.level - 1) * 3.5);
     }
 
-    // +7 maximum EXP per level
     get maxExp() {
-        return this.baseMaxExp + (this.level - 1) * 7;
+        return Math.floor(this.baseMaxExp + (this.level - 1) * 7.5);
     }
 
     get isAlive() {
@@ -82,28 +73,24 @@ export class Enemy {
     tickEffects() {
         const clone = this.clone();
         const newEffects = new Map();
-
         for (const [name, duration] of this.effects.entries()) {
             const newDuration = duration - 1;
             if (newDuration > 0) {
                 newEffects.set(name, newDuration);
             }
         }
-
         clone.effects = newEffects;
         return clone;
     }
 
     applyEffects() {
         const clone = this.clone();
-
         for (const [name] of this.effects.entries()) {
             if (name === "poison") {
                 const poisonDamage = Math.floor(clone.currentHealth * 0.1);
                 clone.currentHealth -= poisonDamage;
             }
         }
-
         return clone;
     }
 
@@ -120,93 +107,91 @@ export class Enemy {
 
 class Goblin extends Enemy {
     constructor(level) {
-        super("Goblin", level, 50, 3, 1, 5, 15, 10, 20);
-        // (name, level, baseHealth, baseAttack, baseDefense, minGold, maxGold, minExp, maxExp)
-    }
-}
-
-class Orc extends Enemy {
-    constructor(level) {
-        super("Orc", level, 80, 5, 3, 10, 25, 15, 30);
-    }
-}
-
-class Troll extends Enemy {
-    constructor(level) {
-        super("Troll", level, 120, 7, 5, 15, 30, 20, 40);
+        super("Goblin", level, 45, 4, 1, 5, 12, 8, 18);
     }
 }
 
 class Skeleton extends Enemy {
     constructor(level) {
-        super("Skeleton", level, 70, 4, 2, 7, 20, 12, 25);
+        super("Skeleton", level, 55, 5, 2, 6, 14, 10, 20);
+    }
+}
+
+class Orc extends Enemy {
+    constructor(level) {
+        super("Orc", level, 80, 7, 3, 10, 20, 15, 28);
     }
 }
 
 class Bandit extends Enemy {
     constructor(level) {
-        super("Bandit", level, 90, 6, 2, 12, 28, 18, 35);
+        super("Bandit", level, 75, 8, 2, 12, 22, 16, 30);
+    }
+}
+
+class Troll extends Enemy {
+    constructor(level) {
+        super("Troll", level, 100, 9, 5, 15, 26, 18, 35);
     }
 }
 
 class Witch extends Enemy {
     constructor(level) {
-        super("Witch", level, 60, 8, 1, 18, 35, 22, 45);
+        super("Witch", level, 65, 10, 2, 16, 28, 20, 38);
     }
 }
 
-//imps with demons
 class Demon extends Enemy {
     constructor(level) {
-        super("Demon", level, 150, 10, 6, 25, 50, 30, 60);
+        super("Demon", level, 130, 12, 6, 20, 35, 24, 45);
     }
 }
 
 class Slimes extends Enemy {
     constructor(level) {
-        super("Slimes", level, 150, 10, 6, 25, 50, 30, 60);
+        super("Slimes", level, 140, 11, 5, 18, 34, 22, 44);
     }
 }
 
 class Miniboss extends Enemy {
     constructor(name, level, baseHealth, baseAttack, baseDefense) {
-        super(name, level, baseHealth, baseAttack, baseDefense, 50, 100, 50, 100);
+        super(name, level, baseHealth, baseAttack, baseDefense, 40, 80, 40, 80);
     }
 }
 
 class Ogre extends Miniboss {
     constructor(level) {
-        super("Ogre Brute", level, 200, 12, 8);
+        super("Ogre Brute", level, 200, 15, 8);
     }
 }
 
 class DarkKnight extends Miniboss {
     constructor(level) {
-        super("Dark Knight", level, 180, 14, 7);
+        super("Dark Knight", level, 180, 17, 7);
     }
 }
 
 class Warlock extends Miniboss {
     constructor(level) {
-        super("Warlock", level, 180, 12, 4, 30, 55, 35, 65);
+        super("Warlock", level, 170, 16, 5);
     }
 }
 
 class GiantSpider extends Miniboss {
     constructor(level) {
-        super("Giant Spider", level, 160, 10, 6, 28, 52, 32, 60);
+        super("Giant Spider", level, 160, 14, 6);
     }
 }
 
 class BloodKnight extends Miniboss {
     constructor(level) {
-        super("Blood Knight", level, 190, 11, 5, 32, 60, 38, 68);
+        super("Blood Knight", level, 190, 16, 7);
     }
 }
 
 class Dragon extends Enemy {
     constructor(level) {
-        super("Dragon", level, 300, 20, 12, 100, 200, 150, 250);
+        super("Dragon", level, 280, 22, 12, 80, 160, 100, 200);
     }
 }
 

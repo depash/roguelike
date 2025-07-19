@@ -8,10 +8,6 @@
     height: fit-content;
     font-family: var(--font-press-start);
     font-size: 13px;
-    text-align: left;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
 }
 
 .currentPlayerContainer {

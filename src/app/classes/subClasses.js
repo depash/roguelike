@@ -33,13 +33,13 @@ export class Warrior extends Player {
             {
                 name: 'Shield Bash',
                 type: 'attack',
-                damage: 14,
+                damage: Math.ceil(10 + this.level * 2),
                 aoe: false,
                 cooldown: 2,
             },
             {
-                name: "Bulwark",
-                type: "buff",
+                name: 'Bulwark',
+                type: 'buff',
                 defensePercent: 0.4,
                 turns: 3,
                 cooldown: 3,
@@ -47,11 +47,10 @@ export class Warrior extends Player {
         ];
     }
 
-    healthPerLevel() { return 30; }
+    healthPerLevel() { return 35; }
     attackPerLevel() { return 2; }
     defensePerLevel() { return 2; }
 }
-
 
 export class Healer extends Player {
     constructor(name = 'Healer') {
@@ -60,14 +59,14 @@ export class Healer extends Player {
             {
                 name: 'Group Heal',
                 type: 'heal',
-                healing: 15,
+                healing: Math.ceil(15 + this.level * 1.5),
                 aoe: true,
                 cooldown: 4,
             },
             {
                 name: 'Single Heal',
                 type: 'heal',
-                healing: 25,
+                healing: Math.ceil(25 + this.level * 1.5),
                 aoe: false,
                 cooldown: 3,
             },
@@ -85,8 +84,6 @@ export class Healer extends Player {
     defensePerLevel() { return 1.5; }
 }
 
-
-
 export class Mage extends Player {
     constructor(name = 'Mage') {
         super(name, 1, 80, 10, 2);
@@ -94,7 +91,7 @@ export class Mage extends Player {
             {
                 name: 'Firestorm',
                 type: 'attack',
-                damage: 15,
+                damage: Math.ceil(10 + this.level * 2.5),
                 aoe: true,
                 cooldown: 3,
             },
@@ -102,7 +99,7 @@ export class Mage extends Player {
                 name: 'Stun Bolt',
                 effectType: 'stun',
                 type: 'effect',
-                damage: 8,
+                damage: Math.ceil(6 + this.level * 1.5),
                 aoe: false,
                 cooldown: 6,
                 turns: 3,
@@ -122,8 +119,6 @@ export class Mage extends Player {
     defensePerLevel() { return 0.5; }
 }
 
-
-
 export class Rogue extends Player {
     constructor(name = 'Rogue') {
         super(name, 1, 100, 7, 3);
@@ -131,7 +126,7 @@ export class Rogue extends Player {
             {
                 name: 'Poison Dagger',
                 type: 'effect',
-                damage: 6,
+                damage: Math.ceil(6 + this.level * 1.5),
                 effectType: 'poison',
                 aoe: false,
                 cooldown: 4,
@@ -140,7 +135,7 @@ export class Rogue extends Player {
             {
                 name: 'Backstab',
                 type: 'attack',
-                damage: 18,
+                damage: Math.ceil(18 + this.level * 1.5),
                 aoe: false,
                 cooldown: 3,
                 ignoresDefense: true,
@@ -160,5 +155,3 @@ export class Rogue extends Player {
     attackPerLevel() { return 2.5; }
     defensePerLevel() { return 1; }
 }
-
-
