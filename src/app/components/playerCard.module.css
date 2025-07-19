@@ -1,0 +1,200 @@
+.individualPlayerContainer {
+    background: #1b1b1b;
+    color: #fff;
+    padding: 12px;
+    border: 2px solid #888;
+    width: fit-content;
+    max-width: 350px;
+    height: fit-content;
+    font-family: var(--font-press-start);
+    font-size: 13px;
+}
+
+.currentPlayerContainer {
+    position: relative;
+}
+
+.currentPlayerContainer::before {
+    content: "";
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    right: -16px;
+    bottom: -16px;
+    pointer-events: none;
+    --size: 14px;
+    --thickness: 2px;
+    --pulseMin: -4px;
+    --pulseMax: -7px;
+    outline: var(--thickness) solid white;
+    mask:
+        conic-gradient(at var(--size) var(--size), #0000 75%, #000 0) 0 0 / calc(100% - var(--size)) calc(100% - var(--size)),
+        conic-gradient(#000 0 0) content-box;
+    mask-composite: intersect;
+    -webkit-mask-composite: destination-in;
+    animation: jrpgPulse 2.2s ease-in-out infinite;
+}
+
+.playerDead {
+    opacity: 0.5;
+}
+
+.healingSelectable {
+    border: 2px dashed rgb(78, 255, 116, 0.3);
+    position: relative;
+    transition: border-color 0.2s;
+}
+
+.healingSelectable:hover {
+    box-shadow: 0 0 8px 2px rgb(78, 255, 116, 0.4);
+    background-color: #000;
+    cursor: pointer;
+}
+
+.healingSelectableAoe {
+    border: 2px dashed rgb(78, 255, 116, 0.3);
+    position: relative;
+    transition: border-color 0.2s;
+}
+
+.resurrectSelectable {
+    border: 2px dashed gold;
+    box-shadow: 0 0 12px 4px gold;
+    position: relative;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.resurrectSelectable:hover {
+    box-shadow: 0 0 18px 6px gold;
+    background-color: rgba(255, 215, 0, 0.15);
+}
+
+html:has(.healingSelectableAoe:hover) .healingSelectableAoe {
+    box-shadow: 0 0 8px 2px rgb(78, 255, 116, 0.4);
+    background-color: #000;
+    cursor: pointer;
+}
+
+@keyframes jrpgPulse {
+
+    0%,
+    100% {
+        outline-offset: var(--pulseMin);
+    }
+
+    50% {
+        outline-offset: var(--pulseMax);
+    }
+}
+
+.playerInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.xpBarContainer {
+    display: flex;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.xpBarLabel {
+    font-weight: bold;
+    width: 30px;
+}
+
+.xpBarWrapper {
+    width: 120px;
+    height: 6px;
+    background-color: #111;
+    border: 1px solid #555;
+    overflow: hidden;
+}
+
+.xpBarProgress {
+    height: 100%;
+    background-color: #4eff74;
+    transition: width 0.3s ease-in-out;
+}
+
+.playerActions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.attackButton {
+    background: #c62828;
+    color: white;
+    padding: 10px 18px;
+    border: 2px solid #7f1d1d;
+    box-shadow: 0 3px #4b0c0c;
+    font-weight: bold;
+    font-size: 11px;
+    font-family: var(--font-press-start);
+    cursor: pointer;
+    transition: transform 0.1s ease-in-out;
+}
+
+.attackButton:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px #4b0c0c;
+}
+
+.attackButton:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px #4b0c0c;
+}
+
+.skillsButton {
+    background: #2e7d32;
+    color: white;
+    padding: 10px 18px;
+    border: 2px solid #1b5e20;
+    box-shadow: 0 3px #103913;
+    font-weight: bold;
+    font-size: 11px;
+    font-family: var(--font-press-start);
+    cursor: pointer;
+    transition: transform 0.1s ease-in-out;
+}
+
+.skillsButton:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px #103913;
+}
+
+.skillsButton:active {
+    transform: translateY(1px);
+    box-shadow: 0 1px #103913;
+}
+
+.buffsContainer {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.buffIconWrapper {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: #222;
+    border: 1px solid #555;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 14px;
+    user-select: none;
+}
+
+.buffIcon {
+    font-size: 18px;
+}
+
+.buffDuration {
+    font-size: 12px;
+    color: #f0c674;
+    font-weight: bold;
+}

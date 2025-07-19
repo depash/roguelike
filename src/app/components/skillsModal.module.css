@@ -1,0 +1,64 @@
+.skillsModalInline {
+    position: absolute;
+    bottom: 0;
+    left: 102%;
+    background-color: #1b1b1b;
+    border: 2px solid #888;
+    padding: 8px 12px;
+    min-width: 140px;
+    font-size: 11px;
+    z-index: 3;
+    box-shadow: 0 0 8px #000;
+}
+
+.modalBackdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 2;
+}
+
+.skillsHeader {
+    font-size: 11px;
+    margin: 0 0 6px;
+    text-align: center;
+    border-bottom: 1px solid #444;
+    padding-bottom: 2px;
+}
+
+.skillsList {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.skillItem {
+    padding: 4px 6px;
+    background-color: #111;
+    border: 1px solid #444;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.skillItem:hover {
+    background-color: #333;
+    border-color: #aaa;
+}
+
+.skillOnCooldown {
+    opacity: 0.5;
+    cursor: not-allowed;
+    color: #888;
+    background-color: #222;
+    border-color: #555;
+}
+
+.cooldownTimer {
+    font-size: 0.8em;
+    color: #f66;
+    margin-left: 6px;
+    font-weight: bold;
+}

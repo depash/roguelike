@@ -1,0 +1,78 @@
+.individualEnemyContainer {
+    background: #1b1b1b;
+    color: #fff;
+    padding: 12px;
+    border: 2px solid #888;
+    width: fit-content;
+    max-width: 350px;
+    height: 250px;
+    font-family: var(--font-press-start);
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.enemyDead {
+    opacity: 0.5;
+}
+
+.enemySelectable {
+    border: 2px dashed rgba(255, 68, 68, 0.3);
+    position: relative;
+    transition: border-color 0.2s;
+}
+
+.enemySelectable:hover {
+    box-shadow: 0 0 8px 2px rgba(255, 68, 68, 0.4);
+    background-color: #000;
+    cursor: pointer;
+}
+
+.enemySelectableAoe {
+    border: 2px dashed rgba(255, 68, 68, 0.3);
+    position: relative;
+    transition: border-color 0.2s;
+}
+
+html:has(.enemySelectableAoe:hover) .enemySelectableAoe {
+    box-shadow: 0 0 8px 2px rgba(255, 68, 68, 0.4);
+    background-color: #000;
+    cursor: pointer;
+}
+
+.effectsContainer {
+    display: flex;
+    gap: 8px;
+    margin-top: 6px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.effectIconWrapper {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-size: 20px;
+}
+
+.effectIcon {
+    display: block;
+}
+
+.effectDuration {
+    position: absolute;
+    bottom: -6px;
+    right: -6px;
+    font-size: 10px;
+    background-color: black;
+    border-radius: 50%;
+    padding: 1px 4px;
+}
+
+.redShield {
+    color: red;
+}

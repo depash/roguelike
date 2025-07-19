@@ -1,0 +1,30 @@
+.healthBarContainer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.healthBarLabel {
+    font-weight: bold;
+    min-width: 24px;
+}
+
+.healthBarWrapper {
+    position: relative;
+    width: 100px;
+    height: 8px;
+    background: #222;
+    border: 1px solid #444;
+    overflow: hidden;
+    image-rendering: pixelated;
+}
+
+.healthBarProgress {
+    height: 100%;
+    transition: width 0.3s ease-in-out, background-color 0.3s ease-in-out;
+}
+
+.healthNumbers {
+    min-width: 70px;
+    text-align: right;
+}

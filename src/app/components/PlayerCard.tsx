@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SkillsModal } from "./skillsModal";
+import { SkillsModal } from "./SkillsModal";
 import styles from "./playerCard.module.css";
 import shared from "./shared.module.css";
 
