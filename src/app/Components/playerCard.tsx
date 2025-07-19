@@ -1,7 +1,29 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { SkillsModal } from "./skillsModal";
 import styles from "./playerCard.module.css";
 import shared from "./shared.module.css";
+
+type Skill = {
+    name: string;
+    type: 'attack' | 'heal' | 'effect' | 'buff';
+    damage?: number;
+    aoe?: boolean;
+};
+
+type PlayerCardProps = {
+    player: any;
+    playerIndex: number;
+    currentPlayer: boolean;
+    handleAttackClicked: (attack: number, aoe: boolean, skill: Skill) => void;
+    cooldowns: any;
+    actionType: string;
+    handleHealClicked: any;
+    handlePlayerHeal: (playerIndex: number) => void;
+    handleBuffClicked: any;
+    handleEffectClicked: any;
+    aoe: boolean;
+    skillMeta: any;
+};
 
 export const PlayerCard = ({
     player,
@@ -16,7 +38,7 @@ export const PlayerCard = ({
     handleEffectClicked,
     aoe,
     skillMeta
-}) => {
+}: PlayerCardProps) => {
     const [showSkills, setShowSkills] = useState(false);
 
     const openSkills = () => {
@@ -59,7 +81,7 @@ export const PlayerCard = ({
         selectableClass
     ].filter(Boolean).join(" ");
 
-    const buffIcons = {
+    const buffIcons: Record<string, React.ReactElement> = {
         bulwark: <span style={{ color: "#4CAF50" }}>🛡️</span>,
         "arcane empowerment": <span>✨</span>,
     };
@@ -90,7 +112,7 @@ export const PlayerCard = ({
                             title={`${buffName.charAt(0).toUpperCase() + buffName.slice(1)} (${buffData.duration} turns)`}
                         >
                             <span className={styles.buffIcon}>
-                                {buffIcons[buffName.toLowerCase()]}
+                                {buffIcons[(buffName as string).toLowerCase()]}
                             </span>
                             <span className={styles.buffDuration}>{buffData.duration}</span>
                         </div>
@@ -142,7 +164,16 @@ export const PlayerCard = ({
                     disabled={!currentPlayer}
                     onClick={(e) => {
                         e.stopPropagation();
-                        handleAttackClicked(player.attack, false);
+                        handleAttackClicked(
+                            player.attack,
+                            false,
+                            {
+                                name: "Basic Attack",
+                                type: "attack",
+                                damage: player.attack,
+                                aoe: false
+                            }
+                        );
                     }}
                 >
                     Attack

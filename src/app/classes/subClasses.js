@@ -27,7 +27,7 @@ export class Warrior extends Player {
                 name: 'Taunt',
                 type: 'effect',
                 aoe: true,
-                cooldown: 0,
+                cooldown: 3,
                 turns: 2,
             },
             {
@@ -35,14 +35,14 @@ export class Warrior extends Player {
                 type: 'attack',
                 damage: Math.ceil(10 + this.level * 2),
                 aoe: false,
-                cooldown: 2,
+                cooldown: 3,
             },
             {
                 name: 'Bulwark',
                 type: 'buff',
                 defensePercent: 0.4,
                 turns: 3,
-                cooldown: 3,
+                cooldown: 5,
             }
         ];
     }
@@ -61,7 +61,7 @@ export class Healer extends Player {
                 type: 'heal',
                 healing: Math.ceil(15 + this.level * 1.5),
                 aoe: true,
-                cooldown: 4,
+                cooldown: 5,
             },
             {
                 name: 'Single Heal',
@@ -74,7 +74,7 @@ export class Healer extends Player {
                 name: 'resurrect',
                 type: 'heal',
                 target: 'ally',
-                cooldown: 6,
+                cooldown: 8,
             }
         ];
     }
@@ -93,7 +93,7 @@ export class Mage extends Player {
                 type: 'attack',
                 damage: Math.ceil(10 + this.level * 2.5),
                 aoe: true,
-                cooldown: 3,
+                cooldown: 4,
             },
             {
                 name: 'Stun Bolt',
@@ -101,14 +101,14 @@ export class Mage extends Player {
                 type: 'effect',
                 damage: Math.ceil(6 + this.level * 1.5),
                 aoe: false,
-                cooldown: 6,
-                turns: 3,
+                cooldown: 7,
+                turns: 2,
             },
             {
                 name: 'Arcane Empowerment',
                 type: 'buff',
                 attackPercent: 0.2,
-                cooldown: 3,
+                cooldown: 5,
                 turns: 3,
             }
         ];
@@ -129,15 +129,15 @@ export class Rogue extends Player {
                 damage: Math.ceil(6 + this.level * 1.5),
                 effectType: 'poison',
                 aoe: false,
-                cooldown: 4,
-                turns: 3,
+                cooldown: 5,
+                turns: 4,
             },
             {
                 name: 'Backstab',
                 type: 'attack',
                 damage: Math.ceil(18 + this.level * 1.5),
                 aoe: false,
-                cooldown: 3,
+                cooldown: 4,
                 ignoresDefense: true,
             },
             {
@@ -145,7 +145,7 @@ export class Rogue extends Player {
                 type: 'effect',
                 effectType: 'defenseDebuff',
                 target: 'enemy',
-                cooldown: 3,
+                cooldown: 5,
                 turns: 3,
             }
         ];

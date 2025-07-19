@@ -1,11 +1,11 @@
 "use client";
 import React, { useEffect, useRef, useState } from 'react'
 import styles from "./page.module.css";
-import { Player } from '../classes/player.js'
-import { Enemy, generateEnemyGroup } from '../classes/enemies.js'
-import { EnemyCard } from '../components/EnemyCard.js';
-import { PlayerCard } from '../components/PlayerCard.js';
-import { Warrior, Healer, Mage, Rogue } from '../classes/subClasses.js';
+import { Player } from '../classes/player'
+import { Enemy, generateEnemyGroup } from '../classes/enemies'
+import { EnemyCard } from '../components/enemyCard';
+import { PlayerCard } from '../components/playerCard';
+import { Warrior, Healer, Mage, Rogue } from '../classes/subClasses';
 
 // mabey big boss at the end of each 25 rooms before endless mode of some kind
 // get random allie as the rooms go on
@@ -14,7 +14,6 @@ import { Warrior, Healer, Mage, Rogue } from '../classes/subClasses.js';
 
 // adding sounds of combat
 // add images to enimies and players
-// floors that be what determines allies being added or rest spot
 const rooms = () => {
     const classes = [Warrior, Healer, Mage, Rogue];
     const initiativeOrder = useRef<(Player)[]>([]);
@@ -145,7 +144,7 @@ const rooms = () => {
         }
     };
 
-    const handleAttackClicked = (damage: number, aoe: boolean, skill?: any) => {
+    const handleAttackClicked = (damage: number, aoe: boolean, skill: any) => {
         setActionType("attack");
         setDamage(damage);
         setAoe(aoe);

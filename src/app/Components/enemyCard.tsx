@@ -1,13 +1,32 @@
 import styles from "./enemyCard.module.css";
 import shared from "./shared.module.css";
 
-export const EnemyCard = ({ enemyIndex, enemy, actionType, handleEnemyTargetedSkill, aoe }) => {
+type Enemy = {
+    name: string;
+    level: number;
+    currentHealth: number;
+    maxHealth: number;
+    attack: number;
+    defense: number;
+    isAlive: boolean;
+    effects: Map<string, number>;
+};
+
+interface EnemyCardProps {
+    enemyIndex: number;
+    enemy: Enemy;
+    actionType: string;
+    handleEnemyTargetedSkill: (enemyIndex: number) => void;
+    aoe?: boolean;
+}
+
+export const EnemyCard = ({ enemyIndex, enemy, actionType, handleEnemyTargetedSkill, aoe }: EnemyCardProps) => {
     const healthPercent = enemy.currentHealth / enemy.maxHealth;
     let healthColor = "#00cc66";
     if (healthPercent <= 0.5) healthColor = "#ffcc00";
     if (healthPercent <= 0.25) healthColor = "#e63946";
 
-    const canTargetEnemy = (enemy) => {
+    const canTargetEnemy = (enemy: Enemy) => {
         return enemy.isAlive && (actionType === "attack" || actionType === "effect");
     };
 
@@ -42,7 +61,9 @@ export const EnemyCard = ({ enemyIndex, enemy, actionType, handleEnemyTargetedSk
                                 title={`${effectName.charAt(0).toUpperCase() + effectName.slice(1)} (${duration} turns)`}
                             >
                                 <span className={styles.effectIcon}>
-                                    {effectIcons[effectName.toLowerCase()]}
+                                    {effectIcons.hasOwnProperty(effectName.toLowerCase())
+                                        ? effectIcons[effectName.toLowerCase() as keyof typeof effectIcons]
+                                        : effectName}
                                 </span>
                                 <span className={styles.effectDuration}>{duration}</span>
                             </div>

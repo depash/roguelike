@@ -1,6 +1,37 @@
 import styles from "./skillsModal.module.css";
 
-export const SkillsModal = ({ player, closeSkills, cooldowns, handleAttackClicked, handleHealClicked, handleBuffClicked, handleEffectClicked, playerIndex }) => {
+type Skill = {
+    name: string;
+    type: 'attack' | 'heal' | 'effect' | 'buff';
+    damage?: number;
+    aoe?: boolean;
+};
+
+type Player = {
+    skills: Skill[];
+};
+
+type SkillsModalProps = {
+    player: Player;
+    closeSkills: () => void;
+    cooldowns: Map<string, number>;
+    handleAttackClicked: (damage: number, aoe: boolean, skill: Skill) => void;
+    handleHealClicked: (skill: Skill) => void;
+    handleBuffClicked: (skill: Skill, playerIndex: number) => void;
+    handleEffectClicked: (skill: Skill) => void;
+    playerIndex: number;
+};
+
+export const SkillsModal = ({
+    player,
+    closeSkills,
+    cooldowns,
+    handleAttackClicked,
+    handleHealClicked,
+    handleBuffClicked,
+    handleEffectClicked,
+    playerIndex
+}: SkillsModalProps) => {
     return (
         <>
             <div className={styles.modalBackdrop} onClick={closeSkills}></div>
@@ -19,7 +50,7 @@ export const SkillsModal = ({ player, closeSkills, cooldowns, handleAttackClicke
                                     if (onCooldown) {
                                         return;
                                     }
-                                    if (skill.type === 'attack') handleAttackClicked(skill.damage, skill.aoe, skill);
+                                    if (skill.type === 'attack') handleAttackClicked(skill.damage ?? 0, skill.aoe ?? false, skill);
                                     else if (skill.type === 'heal') handleHealClicked(skill);
                                     else if (skill.type === 'effect') handleEffectClicked(skill);
                                     else if (skill.type === 'buff') handleBuffClicked(skill, playerIndex);
