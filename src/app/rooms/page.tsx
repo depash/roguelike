@@ -3,8 +3,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import styles from "./page.module.css";
 import { Player } from '../classes/player'
 import { Enemy, generateEnemyGroup } from '../classes/enemies'
-import { EnemyCard } from '../components/enemyCard';
-import { PlayerCard } from '../components/playerCard';
+import { EnemyCard } from '../components/EnemyCard';
+import { PlayerCard } from '../components/PlayerCard';
 import { Warrior, Healer, Mage, Rogue } from '../classes/subClasses';
 
 // mabey big boss at the end of each 25 rooms before endless mode of some kind

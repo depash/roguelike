@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { SkillsModal } from "./skillsModal";
-import styles from "./playerCard.module.css";
-import shared from "./shared.module.css";
+import { SkillsModal } from "./SkillsModal";
+import styles from "./PlayerCard.module.css";
+import shared from "./Shared.module.css";
 
 type Skill = {
     name: string;
@@ -57,28 +57,25 @@ export const PlayerCard = ({
 
     const isResurrect = skillMeta?.name?.toLowerCase() === "resurrect";
     const isSelectableForRes = isResurrect && !player.isAlive && actionType === "heal";
-    const isSelectableNormal =
-        !isResurrect && player.isAlive && (actionType === "heal" || actionType === "buff");
+    const isSelectableNormal = !isResurrect && player.isAlive && (actionType === "heal" || actionType === "buff");
+    const shouldDimBecauseUnselectable = !isResurrect && player.isAlive && actionType === "heal" && !isSelectableNormal;
 
-    const shouldDimBecauseUnselectable =
-        isResurrect && player.isAlive && actionType === "heal";
-
-    const selectableClass =
-        (isSelectableForRes || isSelectableNormal)
+    const selectableClass = isSelectableForRes
+        ? `${styles.healingSelectable} ${styles.resurrectSelectable}`
+        : isSelectableNormal
             ? aoe
                 ? styles.healingSelectableAoe
                 : styles.healingSelectable
             : "";
 
-    const isVisuallyDead =
-        !player.isAlive && (!isResurrect || actionType !== "heal");
+    const isVisuallyDead = !player.isAlive && (!isResurrect || actionType !== "heal");
 
     const playerClasses = [
         styles.individualPlayerContainer,
         isVisuallyDead && styles.playerDead,
         shouldDimBecauseUnselectable && styles.dimUnselectable,
         currentPlayer && styles.currentPlayerContainer,
-        selectableClass
+        selectableClass,
     ].filter(Boolean).join(" ");
 
     const buffIcons: Record<string, React.ReactElement> = {
@@ -100,6 +97,7 @@ export const PlayerCard = ({
                     handlePlayerHeal(playerIndex);
                 }
             }}
+            title={isResurrect && !player.isAlive ? "Click to resurrect" : undefined}
         >
             <div className={styles.playerInfo}>
                 <h2>{player.name}</h2>

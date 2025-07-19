@@ -87,7 +87,7 @@ export class Enemy {
         const clone = this.clone();
         for (const [name] of this.effects.entries()) {
             if (name === "poison") {
-                const poisonDamage = Math.floor(clone.currentHealth * 0.1);
+                const poisonDamage = Math.max(1, Math.floor(clone.currentHealth * 0.1));
                 clone.currentHealth -= poisonDamage;
             }
         }

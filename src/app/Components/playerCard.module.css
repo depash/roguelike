@@ -14,14 +14,6 @@
     position: relative;
 }
 
-.playerDead {
-    opacity: 0.5;
-}
-
-.dimUnselectable {
-    opacity: 0.5;
-}
-
 .currentPlayerContainer::before {
     content: "";
     position: absolute;
@@ -43,6 +35,10 @@
     animation: jrpgPulse 2.2s ease-in-out infinite;
 }
 
+.playerDead {
+    opacity: 0.5;
+}
+
 .healingSelectable {
     border: 2px dashed rgb(78, 255, 116, 0.3);
     position: relative;
@@ -59,6 +55,19 @@
     border: 2px dashed rgb(78, 255, 116, 0.3);
     position: relative;
     transition: border-color 0.2s;
+}
+
+.resurrectSelectable {
+    border: 2px dashed gold;
+    box-shadow: 0 0 12px 4px gold;
+    position: relative;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.resurrectSelectable:hover {
+    box-shadow: 0 0 18px 6px gold;
+    background-color: rgba(255, 215, 0, 0.15);
 }
 
 html:has(.healingSelectableAoe:hover) .healingSelectableAoe {

@@ -1,5 +1,5 @@
-import styles from "./enemyCard.module.css";
-import shared from "./shared.module.css";
+import styles from "./EnemyCard.module.css";
+import shared from "./Shared.module.css";
 
 type Enemy = {
     name: string;

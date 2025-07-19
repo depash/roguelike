@@ -1,4 +1,4 @@
-import styles from "./skillsModal.module.css";
+import styles from "./SkillsModal.module.css";
 
 type Skill = {
     name: string;
