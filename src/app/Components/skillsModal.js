@@ -37,4 +37,3 @@ export const SkillsModal = ({ player, closeSkills, cooldowns, handleAttackClicke
         </>
     );
 };
-
