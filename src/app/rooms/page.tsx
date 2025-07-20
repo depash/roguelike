@@ -43,6 +43,8 @@ const rooms = () => {
     } | null>(null);
     const [aoe, setAoe] = useState<boolean>(false);
     const aliveEnemies = useRef<Enemy[]>([...enemies]);
+    const [floorOptions, setFloorOptions] = useState<String[]>([]);
+    const [choosingFloor, setChoosingFloor] = useState(false);
 
     const generateInitiativeOrder = (players: Player[]) => {
         const allCharacters = [...players];
@@ -117,30 +119,13 @@ const rooms = () => {
         }
 
         if (!aliveEnemies.current.length) {
-            const nextRoomNum = roomNum + 1;
-            let nextFloorNum = floorNum;
+            const isFinalRoom = roomNum % (floorNum * 5) === 0;
+            const newRoomNum = isFinalRoom ? 1 : roomNum + 1;
+            const newFloorNum = isFinalRoom ? floorNum + 1 : floorNum;
 
-            if (nextRoomNum % (floorNum * 5) === 0) {
-                nextFloorNum += 1;
-            }
-
-            const isFinalRoom = nextRoomNum % (floorNum * 5) === 0;
-
-            setRoomNum(prevRoomNum => {
-                if (isFinalRoom) return 1;
-                return prevRoomNum + 1;
-            });
-
-            if (isFinalRoom) {
-                setFloorNum(prev => prev + 1);
-            }
-
-            const difficulty = Math.min(25, floorNum * 2 + Math.floor(nextRoomNum / 2));
-            const newEnemies = generateEnemyGroup(players[0].level, difficulty, isFinalRoom, floorNum);
-
-            generateInitiativeOrder(players);
-            setEnemies(newEnemies);
-            aliveEnemies.current = newEnemies;
+            setRoomNum(newRoomNum);
+            setFloorNum(newFloorNum);
+            setChoosingFloor(true);
         }
     };
 
@@ -314,9 +299,92 @@ const rooms = () => {
         nextPlayerTurn(updatedEnemies, updatedPlayers);
     };
 
+    const handleFloorChoice = (choice: string) => {
+        let difficulty = Math.min(25, floorNum * 2 + Math.floor(roomNum / 2));
+        const isFinalRoom = roomNum % (floorNum * 5) === 0;
+
+        if (choice === "elite") difficulty += 3;
+
+        if (choice === "mystery") {
+            const mystery = ["heal", "trap", "buff", "elite"][Math.floor(Math.random() * 4)];
+            handleFloorChoice(mystery);
+            return;
+        }
+
+        if (choice === "trap") {
+            const trapDamage = Math.min(15 + (floorNum * 5), 80);
+            setPlayers(prev => prev.map(p => (!p.isAlive ? p : p.takeDamage(trapDamage))));
+        }
+
+        if (choice === "buff") {
+            setPlayers(prev => prev.map(p =>
+                p
+                    .addBuff("Bulwark", { duration: 3, defense: 0.4 })
+                    .addBuff("Arcane Empowerment", { duration: 3, attack: 0.2 })
+            ));
+        }
+
+        if (choice === "heal") {
+            setPlayers(prev => prev.map(p => p.heal(p.maxHealth)));
+        }
+
+        if (["trap", "buff", "heal"].includes(choice)) {
+            const newRoomNum = isFinalRoom ? 1 : roomNum + 1;
+            const newFloorNum = isFinalRoom ? floorNum + 1 : floorNum;
+
+            setRoomNum(newRoomNum);
+            setFloorNum(newFloorNum);
+            setTimeout(() => setChoosingFloor(true), 300);
+            setChoosingFloor(false);
+            return;
+        }
+
+        let newEnemies: Enemy[] = [];
+        if (choice === "miniboss") {
+            newEnemies = generateEnemyGroup(players[0].level, difficulty, true, floorNum);
+        } else if (choice === "finalboss") {
+            newEnemies = generateEnemyGroup(players[0].level, difficulty + 5, true, floorNum);
+        } else if (choice === "normal" || choice === "elite") {
+            newEnemies = generateEnemyGroup(players[0].level, difficulty, isFinalRoom, floorNum);
+        }
+
+        if (newEnemies.length > 0) {
+            setEnemies(newEnemies);
+            aliveEnemies.current = newEnemies;
+            generateInitiativeOrder(players);
+        }
+
+        setChoosingFloor(false);
+    };
+
     useEffect(() => {
+        if (choosingFloor) {
+            const options: string[] = [];
+            const isFinalRoom = roomNum % (floorNum * 5) === 0;
+            const isFinalBoss = floorNum === 25 && isFinalRoom;
+
+            if (isFinalRoom) {
+                options.push(isFinalBoss ? "finalboss" : "miniboss");
+            } else {
+                const typesWithWeight = [
+                    ...Array(4).fill("normal"),
+                    ...Array(2).fill("elite"),
+                    "heal",
+                    "trap",
+                    "buff",
+                    "mystery",
+                ];
+
+                while (options.length < 2) {
+                    const rand = typesWithWeight[Math.floor(Math.random() * typesWithWeight.length)];
+                    if (!options.includes(rand)) options.push(rand);
+                }
+            }
+
+            setFloorOptions(options);
+        }
         generateInitiativeOrder(players);
-    }, []);
+    }, [choosingFloor]);
 
     return (
         <div>
@@ -336,6 +404,41 @@ const rooms = () => {
                         />
                     ))}
                 </div>
+
+                {choosingFloor && (
+                    <div className={styles.floorChoiceOverlay}>
+                        <h2>Choose Your Next Room</h2>
+                        <div className={styles.floorChoiceButtons}>
+                            {floorOptions.map((option) => {
+                                const key = option.toString();
+                                const labelMap: Record<string, string> = {
+                                    normal: "Normal Battle",
+                                    elite: "Elite Battle (Extra Rewards)",
+                                    heal: "Healing Spring",
+                                    miniboss: "Miniboss Challenge",
+                                    finalboss: "Final Boss",
+                                    trap: "Trap Room (Takes Damage)",
+                                    buff: "Buff Room (Gain Buffs)",
+                                    mystery: "??? Mystery Room",
+                                };
+
+                                return (
+                                    <button
+                                        key={key}
+                                        onClick={() => handleFloorChoice(key)}
+                                        className={`${styles.floorButton} 
+                                        ${['heal', 'buff'].includes(key) ? styles.positive : ''} 
+                                        ${['miniboss', 'finalboss'].includes(key) ? styles.danger : ''}
+                                        ${['trap'].includes(key) ? styles.trap : ''}
+                                        ${['mystery'].includes(key) ? styles.mystery : ''}
+                                    `}>
+                                        {labelMap[key] || key}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
+                )}
 
                 <div className={styles.playersContainer}>
                     {players.map((player, index) => (

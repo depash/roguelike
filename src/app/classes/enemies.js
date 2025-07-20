@@ -18,15 +18,15 @@ export class Enemy {
     }
 
     get maxHealth() {
-        return Math.floor(this.baseHealth + (this.level - 1) * 12);
+        return this.level <= 3 ? Math.floor(this.baseHealth + (this.level - 1) * 8) : Math.floor(this.baseHealth + (this.level - 1) * 12);
     }
 
     get attack() {
-        return Math.floor(this.baseAttack + (this.level - 1) * 2.2);
+        return this.level <= 3 ? Math.floor(this.baseAttack + (this.level - 1) * 1.5) : Math.floor(this.baseAttack + (this.level - 1) * 2.2);
     }
 
     get defense() {
-        let defense = Math.floor(this.baseDefense + (this.level - 1) * 1.1);
+        let defense = this.level <= 3 ? Math.floor(this.baseDefense + (this.level - 1) * 0.7) : Math.floor(this.baseDefense + (this.level - 1) * 1.1);
         if (this.hasEffect("defenseDebuff")) {
             defense = Math.floor(defense * 0.6);
         }
@@ -34,19 +34,19 @@ export class Enemy {
     }
 
     get minGold() {
-        return Math.floor(this.baseMinGold + (this.level - 1) * 2.5);
+        return Math.floor(this.baseMinGold + (this.level - 1) * 3);
     }
 
     get maxGold() {
-        return Math.floor(this.baseMaxGold + (this.level - 1) * 5.5);
+        return Math.floor(this.baseMaxGold + (this.level - 1) * 6);
     }
 
     get minExp() {
-        return Math.floor(this.baseMinExp + (this.level - 1) * 3.5);
+        return Math.floor(this.baseMinExp + (this.level - 1) * 4);
     }
 
     get maxExp() {
-        return Math.floor(this.baseMaxExp + (this.level - 1) * 7.5);
+        return Math.floor(this.baseMaxExp + (this.level - 1) * 9);
     }
 
     get isAlive() {
@@ -225,7 +225,7 @@ export function generateEnemyGroup(playerLevel, roomDifficulty, isFinalRoom = fa
     }
     else if (isFloorEnd) {
         const MinibossClass = minibosses[Math.floor(Math.random() * minibosses.length)];
-        const miniboss = new MinibossClass(playerLevel + 1);
+        const miniboss = new MinibossClass(playerLevel + 1 + Math.floor(floorNum / 5));
         group.push(miniboss);
         remainingDifficulty -= 4;
     }
