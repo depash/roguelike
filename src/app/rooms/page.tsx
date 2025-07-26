@@ -69,7 +69,7 @@ const rooms = () => {
             return e;
         });
 
-        const alivePlayers = players.filter(p => p.isAlive);
+        let alivePlayers = players.filter(p => p.isAlive);
 
         if (initiativeOrder.current.length) {
             setCurrentPlayer(initiativeOrder.current[0]);
@@ -81,7 +81,9 @@ const rooms = () => {
             for (const enemy of enemiesWithEffectsApplied) {
                 if (enemy.hasEffect("stun")) continue;
 
-                let target: Player | undefined;
+                let target: Player;
+
+                alivePlayers = damagedPlayers.filter(p => p.isAlive);
 
                 if (enemy.hasEffect("taunt") && warrior) {
                     target = warrior;
